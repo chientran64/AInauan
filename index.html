@@ -38,30 +38,33 @@
         
         #aiResponse h3 {
             font-family: 'Quicksand', sans-serif;
-            font-size: 1.25rem;
+            font-size: 1.35rem;
             font-weight: 800;
             color: #7c2d12;
-            margin-top: 1.5rem;
-            margin-bottom: 0.75rem;
+            margin-top: 1.75rem;
+            margin-bottom: 1rem;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
+            border-bottom: 2px solid #fed7aa;
+            padding-bottom: 8px;
         }
         
         #aiResponse h3::before {
-            content: '';
-            display: inline-block;
-            width: 5px;
-            height: 20px;
-            background: var(--primary-orange);
-            border-radius: 10px;
+            content: '👨‍🍳';
+            font-size: 1.2rem;
+        }
+
+        #aiResponse strong {
+            color: #9a3412;
+            font-weight: 700;
         }
 
         #aiResponse table {
             width: 100%;
             border-collapse: separate;
             border-spacing: 0;
-            margin: 1rem 0;
+            margin: 1.5rem 0;
             background: #fff;
             border-radius: 1rem;
             overflow: hidden;
@@ -72,19 +75,29 @@
 
         #aiResponse th {
             background: #fff7ed;
-            padding: 0.75rem;
+            padding: 1rem;
             text-align: left;
             color: #9a3412;
             font-weight: 700;
             text-transform: uppercase;
-            font-size: 0.7rem;
+            font-size: 0.75rem;
             white-space: nowrap;
         }
 
         #aiResponse td {
-            padding: 0.75rem;
+            padding: 0.85rem 1rem;
             border-bottom: 1px solid #fff7ed;
-            font-size: 0.875rem;
+            font-size: 0.9rem;
+        }
+
+        #aiResponse blockquote {
+            background: #fefce8;
+            border-left: 4px solid #fbbf24;
+            padding: 1rem;
+            margin: 1rem 0;
+            font-style: italic;
+            border-radius: 0 0.5rem 0.5rem 0;
+            color: #854d0e;
         }
 
         .switch { position: relative; display: inline-block; width: 48px; height: 24px; }
@@ -121,7 +134,7 @@
             <div class="w-10"></div>
             <div class="text-center">
                 <h1 class="text-2xl md:text-4xl font-bold gradient-text mb-0.5">AI Chef Master</h1>
-                <p class="text-[10px] md:text-base text-gray-500 font-medium italic">"Biến nguyên liệu thành tuyệt tác"</p>
+                <p class="text-[10px] md:text-base text-gray-500 font-medium italic">"Biến nguyên liệu thành tuyệt tác ẩm thực"</p>
             </div>
             <button id="openSettings" class="w-9 h-9 bg-white shadow-sm border border-orange-100 rounded-full flex items-center justify-center text-gray-400 hover:text-orange-500 transition-all btn-active-scale">
                 <i class="fas fa-cog text-lg"></i>
@@ -165,7 +178,7 @@
                             </div>
                             <div>
                                 <span class="block font-bold text-orange-900 text-sm leading-none">Dọn tủ lạnh</span>
-                                <span class="text-[9px] text-orange-600/70 font-medium">Tìm món từ đồ có sẵn</span>
+                                <span class="text-[9px] text-orange-600/70 font-medium">Sáng tạo từ đồ có sẵn</span>
                             </div>
                         </div>
                         <label class="switch">
@@ -181,7 +194,7 @@
                             </div>
                             <div>
                                 <span class="block font-bold text-blue-900 text-sm leading-none">Quét ảnh</span>
-                                <span class="text-[9px] text-blue-600/70 font-medium">Nhận diện qua hình ảnh</span>
+                                <span class="text-[9px] text-blue-600/70 font-medium">Nhận diện nguyên liệu</span>
                             </div>
                         </div>
                         <button onclick="document.getElementById('imageInput').click()" class="bg-white border border-blue-100 text-blue-600 px-3 py-1.5 rounded-xl text-[10px] font-bold hover:bg-blue-500 hover:text-white transition-all btn-active-scale shadow-sm">Chọn</button>
@@ -221,8 +234,8 @@
                         <label class="block text-[9px] font-black text-gray-400 mb-1.5 uppercase tracking-wider ml-1">Giọng điệu</label>
                         <div class="relative">
                             <select id="persona" class="w-full p-3.5 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:border-blue-300 text-xs font-bold text-gray-700 appearance-none">
-                                <option value="Thân thiện" selected>🌟 Thân thiện</option>
-                                <option value="Bếp trưởng chuyên nghiệp">👨‍🍳 Chuyên gia</option>
+                                <option value="Thân thiện">🌟 Thân thiện</option>
+                                <option value="Bếp trưởng cao cấp (Chuyên sâu nguyên lý, nhiệt độ, gia vị)" selected>👨‍🍳 Bếp trưởng cao cấp</option>
                                 <option value="Hài hước">🤣 Hài hước</option>
                             </select>
                             <i class="fas fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-gray-300 pointer-events-none"></i>
@@ -231,13 +244,13 @@
                 </div>
 
                 <div class="mb-6">
-                    <label class="block text-[9px] font-black text-gray-400 mb-1.5 uppercase tracking-wider ml-1">Bạn muốn ăn gì?</label>
-                    <textarea id="userInput" rows="2" class="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:border-orange-400 text-sm font-bold text-gray-700" placeholder="VD: Món gì đó cay cay từ thịt bò..."></textarea>
+                    <label class="block text-[9px] font-black text-gray-400 mb-1.5 uppercase tracking-wider ml-1">Yêu cầu cụ thể của bạn</label>
+                    <textarea id="userInput" rows="2" class="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:border-orange-400 text-sm font-bold text-gray-700" placeholder="VD: Một bữa tối lãng mạn với cá hồi và rượu vang..."></textarea>
                 </div>
 
                 <div class="flex flex-col gap-3">
                     <button id="generateBtn" class="bg-orange-500 hover:bg-orange-600 text-white font-black py-4 rounded-2xl shadow-lg shadow-orange-500/20 flex items-center justify-center gap-2 transition-all btn-active-scale text-base">
-                        <i class="fas fa-fire-alt"></i> NẤU NGAY!
+                        <i class="fas fa-fire-alt"></i> NẤU NGAY!!!
                     </button>
                     <button id="generateImgBtn" class="bg-amber-50 hover:bg-amber-100 text-amber-700 font-bold py-3.5 rounded-2xl flex items-center justify-center gap-2 transition-all btn-active-scale border border-amber-200 text-sm">
                         <i class="fas fa-magic text-xs"></i> XEM ẢNH MINH HỌA
@@ -247,7 +260,7 @@
                 <!-- Response Area -->
                 <div id="resultContainer" class="hidden mt-8 space-y-4 animate-in fade-in duration-500">
                     <img id="dishImage" class="hidden w-full max-h-[400px] object-cover rounded-2xl shadow-lg border-4 border-white" src="">
-                    <div class="bg-white p-4 md:p-10 rounded-2xl md:rounded-[2.5rem] border border-orange-100 shadow-lg relative overflow-hidden">
+                    <div class="bg-white p-4 md:p-10 rounded-2xl border border-orange-100 shadow-lg relative overflow-hidden">
                         <div id="aiResponse" class="relative z-10"></div>
                     </div>
                 </div>
@@ -256,7 +269,7 @@
                     <div class="inline-block p-6 bg-orange-50 rounded-full mb-4">
                         <i class="fas fa-utensils text-3xl text-orange-500 animate-spin"></i>
                     </div>
-                    <p class="text-orange-600 font-black uppercase text-[10px] tracking-widest">Chef đang sáng tạo<span class="loading-dots"></span></p>
+                    <p class="text-orange-600 font-black uppercase text-[10px] tracking-widest">Bếp trưởng đang soạn thực đơn chuyên sâu<span class="loading-dots"></span></p>
                 </div>
             </div>
         </div>
@@ -264,10 +277,10 @@
         <!-- History -->
         <div class="bg-white rounded-2xl md:rounded-[2.5rem] shadow-lg p-5 md:p-8 border border-gray-50">
             <h2 class="text-lg md:text-2xl font-black text-gray-800 mb-5 flex items-center gap-3">
-                <i class="fas fa-history text-orange-400 text-base"></i> Sổ tay bếp
+                <i class="fas fa-history text-orange-400 text-base"></i> Nhật ký bếp
             </h2>
             <div id="historyList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 max-h-[500px] overflow-y-auto">
-                <p class="col-span-full text-center text-gray-400 py-10 text-xs italic">Đang đồng bộ...</p>
+                <p class="col-span-full text-center text-gray-400 py-10 text-xs italic">Đang tải sổ tay...</p>
             </div>
         </div>
     </div>
@@ -417,9 +430,23 @@
             resultContainer.classList.add('hidden');
 
             try {
-                const systemPrompt = `BẠN LÀ ĐẦU BẾP AI. GIỌNG ĐIỆU: ${personaSelect.value}. TRÌNH ĐỘ: ${complexitySelect.value}. ƯU TIÊN NGUYÊN LIỆU TRONG TỦ. TRÌNH BÀY MARKDOWN, TABLE. TIÊU ĐỀ: ### [Tên món].`;
-                let fullUserPrompt = userInput.value || "Gợi ý món ăn.";
-                if (fridgeToggle.checked && fridgeIngredients.value) fullUserPrompt = `[DỌN TỦ LẠNH] Tôi có: ${fridgeIngredients.value}. ${fullUserPrompt}`;
+                const systemPrompt = `BẠN LÀ MỘT BẾP TRƯỞNG MASTER CHEF CAO CẤP. 
+GIỌNG ĐIỆU: ${personaSelect.value}. 
+TRÌNH ĐỘ YÊU CẦU: ${complexitySelect.value}. 
+
+QUY TẮC PHẢN HỒI:
+1. KHÔNG TIẾT KIỆM TOKEN. Hãy viết hướng dẫn cực kỳ chi tiết, tỉ mỉ. Nếu là mâm cơm gồm nhiều món, hãy hướng dẫn đầy đủ tất cả các món.
+2. CƠ CẤU NỘI DUNG:
+   - ### [Tên món/Thực đơn]
+   - **Phân tích nguyên lý**: Tại sao lại kết hợp các nguyên liệu này? Nguyên lý cân bằng vị (chua-cay-mặn-ngọt-umami).
+   - **Bảng nguyên liệu**: Chi tiết định lượng.
+   - **Quy trình chế biến**: Từng bước nhỏ.
+   - **Kiểm soát nhiệt & Kỹ thuật**: Chỉ rõ mức nhiệt (lửa nhỏ/vừa/lớn), nhiệt độ dầu, hoặc phản ứng Maillard cần đạt được.
+   - **Tips Chuyên Gia**: Bí kíp để nâng tầm món ăn, cách chọn nguyên liệu tươi nhất.
+3. TRÌNH BÀY: Sử dụng Markdown chuyên nghiệp, các bảng (table), và blockquotes cho các tips quan trọng.`;
+
+                let fullUserPrompt = userInput.value || "Hãy gợi ý cho tôi một thực đơn xuất sắc.";
+                if (fridgeToggle.checked && fridgeIngredients.value) fullUserPrompt = `[DỌN TỦ LẠNH] Tôi đang có các nguyên liệu sau: ${fridgeIngredients.value}. Hãy lên thực đơn chi tiết tối ưu nhất dựa trên chúng kết hợp với yêu cầu này: ${fullUserPrompt}`;
 
                 const promptParts = [{ text: fullUserPrompt }];
                 if (base64Image) promptParts.push({ inlineData: { mimeType: "image/png", data: base64Image } });
@@ -436,7 +463,7 @@
 
                 const data = await exponentialBackoff(callGemini);
                 const rawMarkdown = data.candidates[0].content.parts[0].text;
-                lastDishName = (rawMarkdown.match(/### (.*)/)?.[1] || "Món ngon AI").trim();
+                lastDishName = (rawMarkdown.match(/### (.*)/)?.[1] || "Thực đơn Master Chef").trim();
 
                 aiResponse.innerHTML = marked.parse(rawMarkdown);
 
@@ -459,7 +486,7 @@
                     const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-001:predict?key=${userApiKey}`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ instances: { prompt: `Gourmet food photo of ${lastDishName}, studio lighting, high resolution` }, parameters: { sampleCount: 1 } })
+                        body: JSON.stringify({ instances: { prompt: `Fine dining, professional food photography of ${lastDishName}, depth of field, natural lighting, ultra realistic` }, parameters: { sampleCount: 1 } })
                     });
                     if (!res.ok) throw new Error("Image API fail");
                     return await res.json();
