@@ -114,7 +114,7 @@
             <div class="w-10"></div>
             <div class="text-center">
                 <h1 class="text-3xl md:text-5xl font-extrabold gradient-text mb-1">AI Chef Master</h1>
-                <p class="text-[10px] md:text-xs text-gray-400 font-bold uppercase tracking-widest italic">Trợ lý nấu ăn</p>
+                <p class="text-[10px] md:text-xs text-gray-400 font-bold uppercase tracking-widest italic">Nâng tầm ẩm thực gia đình</p>
             </div>
             <button id="openSettings" class="w-10 h-10 bg-white shadow-sm rounded-full flex items-center justify-center text-gray-400 hover:text-orange-500 border border-gray-100">
                 <i class="fas fa-cog"></i>
@@ -239,7 +239,7 @@
                 <i class="fas fa-book-open text-orange-400"></i> Nhật ký nấu nướng
             </h2>
             <div id="historyList" class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <p class="col-span-full text-center text-gray-400 py-4 italic text-xs">Chưa có công thức nào được lưu.</p>
+                <p class="col-span-full text-center text-gray-400 py-4 italic text-xs">Đang tải nhật ký...</p>
             </div>
         </div>
     </div>
@@ -248,14 +248,14 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc, collection, onSnapshot, serverTimestamp, addDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const firebaseConfig = JSON.parse('{"apiKey":"AIzaSyBe6c5S5184DmWzjqRvcMkEBwN_UJ1zLD8","authDomain":"ainauan-f11d0.firebaseapp.com","projectId":"ainauan-f11d0","storageBucket":"ainauan-f11d0.firebasestorage.app","messagingSenderId":"855598869176","appId":"1:855598869176:web:462b821ab92fb7eba1624d"}');
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        const appId = 'pro-chef-master-final';
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'pro-chef-master-final';
 
         let user = null;
         let base64Image = null;
@@ -265,66 +265,148 @@
         // UI Logic
         const showToast = (m) => {
             const t = document.getElementById('toast');
-            t.innerText = m;
-            t.classList.remove('opacity-0', 'translate-y-10');
-            setTimeout(() => t.classList.add('opacity-0', 'translate-y-10'), 2500);
+            if (t) {
+                t.innerText = m;
+                t.classList.remove('opacity-0', 'translate-y-10');
+                setTimeout(() => t.classList.add('opacity-0', 'translate-y-10'), 2500);
+            }
+        };
+
+        // Authentication Setup with fix for token mismatch
+        const initAuth = async () => {
+            try {
+                // RULE 3: Auth BEFORE Queries. Check for __initial_auth_token first.
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    try {
+                        await signInWithCustomToken(auth, __initial_auth_token);
+                    } catch (tokenErr) {
+                        console.warn("Custom token failed, falling back to anonymous", tokenErr);
+                        await signInAnonymously(auth);
+                    }
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (error) {
+                console.error("Critical Auth error:", error);
+            }
         };
 
         onAuthStateChanged(auth, async (u) => {
             user = u;
-            if (!user) await signInAnonymously(auth);
-            else {
-                const configRef = doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'global');
-                const snap = await getDoc(configRef);
-                if (snap.exists()) {
-                    userApiKey = snap.data().apiKey;
-                    document.getElementById('apiKeyInput').value = userApiKey;
+            if (user) {
+                console.log("Authenticated as:", user.uid);
+                // Load Settings
+                try {
+                    const configRef = doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'global');
+                    const snap = await getDoc(configRef);
+                    if (snap.exists()) {
+                        userApiKey = snap.data().apiKey;
+                        document.getElementById('apiKeyInput').value = userApiKey;
+                    }
+                } catch (e) {
+                    console.error("Error loading settings:", e);
                 }
+                // Load History AFTER Auth
                 loadHistory();
+            } else {
+                initAuth();
             }
         });
 
         const loadHistory = () => {
+            if (!user) return;
+            const historyList = document.getElementById('historyList');
             const ref = collection(db, 'artifacts', appId, 'public', 'data', 'history');
+            
+            // Listen for history updates with success/error callbacks
             onSnapshot(ref, (snap) => {
-                const items = snap.docs.map(d => d.data()).sort((a,b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
-                if (items.length === 0) return;
-                historyList.innerHTML = items.map(item => `
-                    <div class="p-4 bg-gray-50 rounded-xl border border-gray-100 cursor-pointer hover:border-orange-200 transition-all" onclick="window.loadContent('${btoa(encodeURIComponent(item.content))}', '${item.title}')">
-                        <h4 class="font-bold text-gray-700 text-xs truncate">${item.title}</h4>
-                        <p class="text-[8px] text-gray-400 mt-1 font-bold">${new Date(item.createdAt?.seconds*1000).toLocaleDateString()}</p>
-                    </div>
-                `).join('');
+                const items = snap.docs.map(d => ({id: d.id, ...d.data()}));
+                
+                // RULE 2: Filter/Sort in memory
+                items.sort((a, b) => {
+                    const timeA = a.createdAt?.seconds || 0;
+                    const timeB = b.createdAt?.seconds || 0;
+                    return timeB - timeA;
+                });
+
+                if (items.length === 0) {
+                    historyList.innerHTML = '<p class="col-span-full text-center text-gray-400 py-4 italic text-xs">Chưa có công thức nào được lưu.</p>';
+                    return;
+                }
+
+                historyList.innerHTML = items.map(item => {
+                    const encodedContent = btoa(encodeURIComponent(item.content));
+                    const safeTitle = (item.title || "Không tên").replace(/'/g, "\\'");
+                    const dateStr = item.createdAt ? new Date(item.createdAt.seconds * 1000).toLocaleDateString() : 'Vừa xong';
+                    return `
+                        <div class="p-4 bg-gray-50 rounded-xl border border-gray-100 cursor-pointer hover:border-orange-200 transition-all" onclick="window.loadContent('${encodedContent}', '${safeTitle}')">
+                            <h4 class="font-bold text-gray-700 text-xs truncate">${item.title || "Công thức không tên"}</h4>
+                            <p class="text-[8px] text-gray-400 mt-1 font-bold">${dateStr}</p>
+                        </div>
+                    `;
+                }).join('');
+            }, (error) => {
+                console.error("History fetch error:", error);
+                historyList.innerHTML = '<p class="col-span-full text-center text-red-400 py-4 text-xs">Lỗi phân quyền hoặc dữ liệu.</p>';
             });
         };
 
         window.loadContent = (encoded, title) => {
-            const raw = decodeURIComponent(atob(encoded));
-            document.getElementById('aiResponse').innerHTML = marked.parse(raw);
-            lastDishName = title;
-            document.getElementById('imageDisplayArea').classList.add('hidden');
-            document.getElementById('resultContainer').classList.remove('hidden');
-            window.scrollTo({top: resultContainer.offsetTop - 20, behavior: 'smooth'});
+            try {
+                const raw = decodeURIComponent(atob(encoded));
+                document.getElementById('aiResponse').innerHTML = marked.parse(raw);
+                lastDishName = title;
+                document.getElementById('imageDisplayArea').classList.add('hidden');
+                document.getElementById('resultContainer').classList.remove('hidden');
+                window.scrollTo({top: document.getElementById('resultContainer').offsetTop - 20, behavior: 'smooth'});
+            } catch (e) {
+                showToast("Lỗi khi tải nội dung");
+            }
         };
 
         document.getElementById('saveSettings').onclick = async () => {
+            if (!user) return showToast("Đang kết nối...");
             const key = document.getElementById('apiKeyInput').value.trim();
             if (!key) return showToast("Vui lòng nhập Key");
-            await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'global'), { apiKey: key });
-            userApiKey = key;
-            showToast("Đã lưu API Key");
-            document.getElementById('settingsModal').classList.add('hidden');
+            try {
+                await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'global'), { apiKey: key });
+                userApiKey = key;
+                showToast("Đã lưu API Key");
+                document.getElementById('settingsModal').classList.add('hidden');
+            } catch (e) {
+                showToast("Lỗi lưu cấu hình");
+            }
         };
 
         document.getElementById('openSettings').onclick = () => document.getElementById('settingsModal').classList.remove('hidden');
         document.getElementById('closeSettings').onclick = () => document.getElementById('settingsModal').classList.add('hidden');
         document.getElementById('fridgeToggle').onchange = (e) => document.getElementById('ingredientsSection').classList.toggle('hidden', !e.target.checked);
 
-        // Core Generation
+        // Core Generation Logic with Exponential Backoff
+        async function fetchGemini(url, payload) {
+            let delay = 1000;
+            for (let i = 0; i < 5; i++) {
+                try {
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    if (response.ok) return await response.json();
+                    if (response.status === 403) throw new Error("API Key không hợp lệ hoặc không có quyền.");
+                } catch (err) {
+                    if (i === 4) throw err;
+                    await new Promise(r => setTimeout(r, delay));
+                    delay *= 2;
+                }
+            }
+        }
+
         document.getElementById('generateBtn').onclick = async () => {
             if (!userApiKey) return showToast("Cần nhập API Key trong cài đặt");
+            if (!user) return showToast("Đang xác thực hệ thống...");
             
-            const input = document.getElementById('userInput').value;
+            const userInput = document.getElementById('userInput').value;
             const ingredients = document.getElementById('fridgeIngredients').value;
             const complexity = document.getElementById('complexity').value;
             const persona = document.getElementById('persona').value;
@@ -335,50 +417,49 @@
             let personaPrompt = "";
             switch(persona) {
                 case 'masterchef': 
-                    personaPrompt = "Bạn là MasterChef. Hãy giải thích cực kỳ chi tiết về NGUYÊN LÝ NẤU ĂN (phản ứng hóa học, nhiệt độ) và cách kết hợp hương vị. KHÔNG TIẾT KIỆM TOKEN. Viết hướng dẫn dài và tỉ mỉ nhất có thể."; 
+                    personaPrompt = "Bạn là MasterChef. Hãy giải thích cực kỳ chi tiết về NGUYÊN LÝ NẤU ĂN và cách kết hợp hương vị. Viết hướng dẫn dài và tỉ mỉ nhất có thể."; 
                     break;
                 case 'friendly': 
-                    personaPrompt = "Bạn là một người bạn nội trợ. Hãy dùng ngôn ngữ ấm áp, hướng dẫn NGẮN GỌN, DỄ HIỂU, tránh thuật ngữ phức tạp."; 
+                    personaPrompt = "Bạn là một người bạn nội trợ. Hãy dùng ngôn ngữ ấm áp, hướng dẫn NGẮN GỌN, DỄ HIỂU."; 
                     break;
                 case 'funny': 
-                    personaPrompt = "Bạn là đầu bếp hài hước. Hãy hướng dẫn bằng cách kể chuyện vui nhộn, ví von hóm hỉnh nhưng vẫn đảm bảo công thức chuẩn."; 
+                    personaPrompt = "Bạn là đầu bếp hài hước. Hãy hướng dẫn bằng cách kể chuyện vui nhộn nhưng vẫn đảm bảo công thức chuẩn."; 
                     break;
             }
 
             const systemInstruction = `${personaPrompt} Độ khó: ${complexity}. Hãy viết công thức theo cấu trúc: # Tên món, ## Tổng quan, ## Nguyên liệu (dùng bảng Table), ## Chế biến tỉ mỉ, ## Mẹo từ Chef.`;
 
             try {
-                let prompt = input || "Gợi ý một món ăn ngon hôm nay.";
+                let prompt = userInput || "Gợi ý một món ăn ngon hôm nay.";
                 if (document.getElementById('fridgeToggle').checked) prompt = `Tủ lạnh có: ${ingredients}. Yêu cầu: ${prompt}`;
 
                 const contents = [{ role: "user", parts: [{ text: prompt }] }];
                 if (base64Image) contents[0].parts.push({ inlineData: { mimeType: "image/png", data: base64Image } });
 
-                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${userApiKey}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        contents, 
-                        systemInstruction: { parts: [{ text: systemInstruction }] },
-                        generationConfig: { maxOutputTokens: 2048 }
-                    })
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${userApiKey}`;
+                const data = await fetchGemini(url, { 
+                    contents, 
+                    systemInstruction: { parts: [{ text: systemInstruction }] },
+                    generationConfig: { maxOutputTokens: 2048 }
                 });
 
-                const data = await res.json();
-                const text = data.candidates[0].content.parts[0].text;
+                const text = data.candidates?.[0]?.content?.parts?.[0]?.text || "Không có phản hồi từ AI.";
                 lastDishName = text.split('\n')[0].replace('#', '').trim();
 
                 document.getElementById('aiResponse').innerHTML = marked.parse(text);
                 document.getElementById('resultContainer').classList.remove('hidden');
 
+                // Save to history
                 await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'history'), {
                     title: lastDishName,
                     content: text,
                     createdAt: serverTimestamp()
                 });
-                window.scrollTo({top: resultContainer.offsetTop - 20, behavior: 'smooth'});
+                
+                window.scrollTo({top: document.getElementById('resultContainer').offsetTop - 20, behavior: 'smooth'});
             } catch (e) {
-                showToast("Lỗi kết nối AI. Kiểm tra API Key.");
+                console.error(e);
+                showToast("Lỗi: " + e.message);
             } finally {
                 document.getElementById('loadingState').classList.add('hidden');
             }
@@ -391,15 +472,12 @@
             document.getElementById('dishImage').classList.add('hidden');
 
             try {
-                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-001:predict?key=${userApiKey}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        instances: [{ prompt: `High-end food photography of ${lastDishName}, appetizing, gourmet plating, soft natural lighting` }],
-                        parameters: { sampleCount: 1 }
-                    })
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-001:predict?key=${userApiKey}`;
+                const data = await fetchGemini(url, {
+                    instances: [{ prompt: `High-end food photography of ${lastDishName}, appetizing, gourmet plating, soft natural lighting` }],
+                    parameters: { sampleCount: 1 }
                 });
-                const data = await res.json();
+                
                 if (data.predictions?.[0]?.bytesBase64Encoded) {
                     document.getElementById('dishImage').src = `data:image/png;base64,${data.predictions[0].bytesBase64Encoded}`;
                     document.getElementById('dishImage').classList.remove('hidden');
