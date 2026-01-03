@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Chef Master - Sổ Tay Nấu Nướng</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap');
+        body {
+            font-family: 'Quicksand', sans-serif;
+            background: #fdf6f0;
+        }
+        .gradient-text {
+            background: linear-gradient(90deg, #f97316, #fbbf24);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .loading-dots:after {
+            content: '.';
+            animation: dots 1.5s steps(5, end) infinite;
+        }
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60% { content: '...'; }
+            80%, 100% { content: ''; }
+        }
+        .dish-item {
+            border-left: 4px solid #f97316;
+            margin-bottom: 2.5rem;
+            background: #fffaf5;
+            padding: 1.5rem;
+            border-radius: 0 1.5rem 1.5rem 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+        }
+        .dish-title {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: #431407;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .shopping-table-container {
+            background: #f0fdf4;
+            border: 2px dashed #22c55e;
+            padding: 1.5rem;
+            border-radius: 1.5rem;
+            margin-bottom: 2.5rem;
+            overflow-x: auto;
+        }
+        .shopping-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+        .shopping-table td {
+            padding: 0.75rem;
+            border-bottom: 1px solid #dcfce7;
+            color: #14532d;
+            font-size: 0.95rem;
+        }
+        .ingredients-box {
+            background: #fff;
+            padding: 1rem;
+            border-radius: 1rem;
+            border: 1px solid #fed7aa;
+            margin-bottom: 1rem;
+        }
+        .modal-overlay {
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+        }
+    </style>
+</head>
+<body class="min-h-screen pb-20">
+
+    <div class="max-w-4xl mx-auto px-4 py-8">
+        <header class="flex justify-between items-center mb-10">
+            <div class="w-10"></div>
+            <div class="text-center">
+                <h1 class="text-4xl font-bold gradient-text mb-2">AI Chef Master</h1>
+                <p class="text-gray-600">Kiến tạo mâm cơm hoàn hảo cho mọi nhu cầu</p>
+            </div>
+            <button id="openSettings" class="w-10 h-10 bg-white shadow-md rounded-full flex items-center justify-center text-gray-500 hover:text-orange-500 transition-colors">
+                <i class="fas fa-cog"></i>
+            </button>
+        </header>
+
+        <!-- API Settings Modal -->
+        <div id="settingsModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal-overlay">
+            <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden">
+                <div class="p-6 border-b border-gray-100 flex justify-between items-center">
+                    <h3 class="font-bold text-xl text-gray-800">Cài đặt hệ thống</h3>
+                    <button id="closeSettings" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times"></i></button>
+                </div>
+                <div class="p-6 space-y-4">
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Google Gemini API Key</label>
+                        <input type="password" id="apiKeyInput" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:border-orange-500 outline-none" placeholder="Nhập API key của bạn...">
+                        <p class="text-[10px] text-gray-400 mt-2 italic">* API Key sẽ được lưu an toàn trên trình duyệt của bạn.</p>
+                    </div>
+                    <button id="saveSettings" class="w-full bg-orange-500 text-white font-bold py-3 rounded-xl hover:bg-orange-600 transition-all">LƯU CÀI ĐẶT</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-3xl shadow-xl overflow-hidden border border-orange-100 mb-8">
+            <div class="p-6 md:p-8">
+                <!-- Status Bar -->
+                <div id="authStatus" class="hidden mb-4 p-3 rounded-xl bg-red-50 border border-red-100 text-red-600 text-xs font-bold flex items-center gap-2">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <span>Chế độ ngoại tuyến: Vui lòng bật Anonymous Auth để lưu dữ liệu đám mây.</span>
+                </div>
+
+                <div class="flex flex-wrap gap-4 mb-6">
+                    <div class="flex-1 min-w-[200px] flex items-center justify-between p-4 bg-orange-50 rounded-2xl border border-orange-100">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-snowflake text-orange-500"></i>
+                            <span class="font-bold text-sm">Dọn tủ lạnh</span>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="fridgeToggle" class="sr-only peer">
+                            <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-500"></div>
+                        </label>
+                    </div>
+
+                    <div class="flex-1 min-w-[200px] flex items-center justify-between p-4 bg-blue-50 rounded-2xl border border-blue-100">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-camera text-blue-500"></i>
+                            <span class="font-bold text-sm">Nhận diện ảnh</span>
+                        </div>
+                        <button onclick="document.getElementById('imageInput').click()" class="bg-blue-500 text-white px-3 py-1 rounded-lg text-xs font-bold hover:bg-blue-600 transition-all">Chọn ảnh</button>
+                        <input type="file" id="imageInput" class="hidden" accept="image/*">
+                    </div>
+                </div>
+
+                <div id="imagePreviewContainer" class="hidden mb-6 relative">
+                    <img id="imagePreview" src="" class="w-full rounded-2xl shadow-inner border border-gray-200">
+                    <button id="removeImage" class="absolute top-2 right-2 bg-red-500 text-white w-8 h-8 rounded-full flex items-center justify-center shadow-lg"><i class="fas fa-times"></i></button>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <div>
+                        <label class="block text-sm font-bold text-orange-800 mb-2 uppercase tracking-wide">🎯 Độ khó</label>
+                        <select id="complexity" class="w-full p-3 bg-orange-50 border-2 border-orange-200 rounded-xl outline-none">
+                            <option value="Dễ">🌟 Dễ</option>
+                            <option value="Trung bình" selected>🏠 Trung bình</option>
+                            <option value="Khó">👨‍🍳 Khó</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-blue-800 mb-2 uppercase tracking-wide">👨‍🍳 Giọng điệu</label>
+                        <select id="persona" class="w-full p-3 bg-blue-50 border-2 border-blue-200 rounded-xl outline-none">
+                            <option value="Người bạn truyền cảm hứng" selected>🌟 Cảm hứng</option>
+                            <option value="Bếp trưởng khắt khe">🔥 Khắt khe</option>
+                            <option value="Giáo sư Ẩm thực">🧬 Khoa học</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="space-y-4 mb-6">
+                    <div id="ingredientsSection" class="hidden">
+                        <label class="block text-sm font-bold text-orange-600 mb-2">Nguyên liệu hiện có:</label>
+                        <input type="text" id="fridgeIngredients" class="w-full p-4 bg-orange-50 border border-orange-200 rounded-2xl outline-none" placeholder="VD: 2 quả trứng, rau cải...">
+                    </div>
+                    <textarea id="userInput" rows="2" class="w-full p-4 bg-gray-50 border border-gray-200 rounded-2xl outline-none focus:border-orange-400 transition-all shadow-inner" placeholder="VD: 'Thịt gà nấu món gì ngon cho 2 người?'"></textarea>
+                </div>
+
+                <div class="flex gap-3">
+                    <button id="generateBtn" class="flex-[2] bg-orange-500 hover:bg-orange-600 text-white font-bold py-4 rounded-2xl shadow-lg flex items-center justify-center gap-2 transition-all active:scale-95">
+                        <i class="fas fa-fire-burner"></i> BẮT ĐẦU NẤU
+                    </button>
+                    <button id="generateImgBtn" class="flex-1 bg-amber-100 hover:bg-amber-200 text-amber-700 font-bold py-4 rounded-2xl flex items-center justify-center gap-2 transition-all active:scale-95">
+                        <i class="fas fa-camera-retro"></i> XEM ẢNH
+                    </button>
+                </div>
+
+                <div id="resultContainer" class="hidden mt-8 space-y-6">
+                    <div id="imagePlaceholder" class="hidden w-full h-64 bg-gray-100 rounded-3xl animate-pulse flex flex-col items-center justify-center text-gray-400 border-2 border-dashed border-gray-200">
+                        <i class="fas fa-wand-magic-sparkles text-3xl mb-2"></i>
+                        <p class="text-sm">Đang phác họa...</p>
+                    </div>
+                    <img id="dishImage" class="hidden w-full max-h-[500px] object-cover rounded-3xl shadow-2xl border-4 border-white" src="">
+                    <div id="activeDishContainer" class="bg-white p-6 md:p-8 rounded-3xl border border-orange-100 shadow-sm relative">
+                        <div id="aiResponse" class="prose max-w-none text-gray-800 leading-relaxed"></div>
+                    </div>
+                </div>
+
+                <div id="loadingState" class="hidden text-center py-10">
+                    <div class="flex justify-center gap-2 mb-4">
+                        <div class="w-3 h-3 bg-orange-500 rounded-full animate-bounce"></div>
+                        <div class="w-3 h-3 bg-orange-500 rounded-full animate-bounce [animation-delay:-.15s]"></div>
+                        <div class="w-3 h-3 bg-orange-500 rounded-full animate-bounce [animation-delay:-.3s]"></div>
+                    </div>
+                    <p class="text-orange-600 font-bold uppercase text-sm">Đầu bếp đang chuẩn bị<span class="loading-dots"></span></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-3xl shadow-xl p-6 md:p-8 border border-gray-100">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-3">
+                <i class="fas fa-book-bookmark text-orange-400"></i> Sổ tay công thức
+            </h2>
+            <div id="historyList" class="grid grid-cols-1 sm:grid-cols-2 gap-4 max-h-[600px] overflow-y-auto pr-2">
+                <p class="col-span-full text-center text-gray-400">Chưa có lịch sử.</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 z-[100] bg-gray-800 text-white px-6 py-3 rounded-full text-sm font-bold shadow-2xl transition-all duration-300 opacity-0 pointer-events-none translate-y-10"></div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, onSnapshot, serverTimestamp, query, doc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBe6c5S5184DmWzjqRvcMkEBwN_UJ1zLD8",
+            authDomain: "ainauan-f11d0.firebaseapp.com",
+            projectId: "ainauan-f11d0",
+            storageBucket: "ainauan-f11d0.firebasestorage.app",
+            messagingSenderId: "855598869176",
+            appId: "1:855598869176:web:462b821ab92fb7eba1624d",
+            measurementId: "G-TNEZJ00S0C"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const appId = 'cooking-master-app';
+
+        let user = null;
+        let base64Image = null;
+        let lastDishName = ""; 
+        // Thay đổi sang localStorage để lưu trữ API Key vĩnh viễn
+        let userApiKey = localStorage.getItem('gemini_api_key') || "";
+
+        const settingsModal = document.getElementById('settingsModal');
+        const apiKeyInput = document.getElementById('apiKeyInput');
+        const saveSettingsBtn = document.getElementById('saveSettings');
+        const toast = document.getElementById('toast');
+        const authStatus = document.getElementById('authStatus');
+
+        if(userApiKey) apiKeyInput.value = userApiKey;
+
+        document.getElementById('openSettings').onclick = () => settingsModal.classList.remove('hidden');
+        document.getElementById('closeSettings').onclick = () => settingsModal.classList.add('hidden');
+        
+        saveSettingsBtn.onclick = () => {
+            userApiKey = apiKeyInput.value.trim();
+            localStorage.setItem('gemini_api_key', userApiKey); // Lưu vào localStorage
+            showToast("Đã lưu API Key thành công!");
+            settingsModal.classList.add('hidden');
+        };
+
+        function showToast(msg) {
+            toast.innerText = msg;
+            toast.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-10');
+            setTimeout(() => toast.classList.add('opacity-0', 'pointer-events-none', 'translate-y-10'), 3000);
+        }
+
+        const initAuth = async () => {
+            try {
+                await signInAnonymously(auth);
+                authStatus.classList.add('hidden');
+            } catch (err) {
+                console.error("Auth error: ", err);
+                authStatus.classList.remove('hidden');
+            }
+        };
+        initAuth();
+
+        onAuthStateChanged(auth, (u) => {
+            user = u;
+            if (user) {
+                loadHistory(); // Tải lịch sử ngay khi user login
+            }
+        });
+
+        const complexitySelect = document.getElementById('complexity');
+        const personaSelect = document.getElementById('persona');
+        const aiResponse = document.getElementById('aiResponse');
+        const loadingState = document.getElementById('loadingState');
+        const resultContainer = document.getElementById('resultContainer');
+        const historyList = document.getElementById('historyList');
+        const dishImage = document.getElementById('dishImage');
+        const imagePlaceholder = document.getElementById('imagePlaceholder');
+        const fridgeToggle = document.getElementById('fridgeToggle');
+        const ingredientsSection = document.getElementById('ingredientsSection');
+        const fridgeIngredients = document.getElementById('fridgeIngredients');
+        const userInput = document.getElementById('userInput');
+
+        fridgeToggle.addEventListener('change', (e) => ingredientsSection.classList.toggle('hidden', !e.target.checked));
+
+        document.getElementById('imageInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    base64Image = event.target.result.split(',')[1];
+                    document.getElementById('imagePreview').src = event.target.result;
+                    document.getElementById('imagePreviewContainer').classList.remove('hidden');
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        document.getElementById('removeImage').addEventListener('click', () => {
+            base64Image = null;
+            document.getElementById('imageInput').value = '';
+            document.getElementById('imagePreviewContainer').classList.add('hidden');
+        });
+
+        async function callGemini(textPrompt) {
+            if (!userApiKey) {
+                settingsModal.classList.remove('hidden');
+                throw new Error("Vui lòng thiết lập API Key trước.");
+            }
+
+            const systemPrompt = `BẠN LÀ ĐẦU BẾP AI CHUYÊN NGHIỆP. 
+            NHẬP VAI: [${personaSelect.value}]
+            TRÌNH ĐỘ: [${complexitySelect.value}]
+            QUY TẮC: 1. Cho 2 người. 2. Có bảng nguyên liệu. 3. Tiêu đề món: ### [Tên món].`;
+
+            const parts = [{ text: textPrompt || "Gợi ý mâm cơm ngon." }];
+            if (fridgeToggle.checked && fridgeIngredients.value) parts[0].text += `\nNguyên liệu sẵn có: ${fridgeIngredients.value}`;
+            if (base64Image) parts.push({ inlineData: { mimeType: "image/png", data: base64Image } });
+
+            const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${userApiKey}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ contents: [{ role: "user", parts: parts }], systemInstruction: { parts: [{ text: systemPrompt }] } })
+            });
+
+            if(!res.ok) throw new Error("Lỗi API Gemini.");
+            const data = await res.json();
+            return data.candidates[0].content.parts[0].text;
+        }
+
+        generateBtn.addEventListener('click', async () => {
+            if (!userInput.value && !base64Image) {
+                showToast("Vui lòng nhập ý tưởng hoặc chọn ảnh!");
+                return;
+            }
+
+            loadingState.classList.remove('hidden');
+            resultContainer.classList.add('hidden');
+            
+            try {
+                const rawText = await callGemini(userInput.value);
+                const titleMatch = rawText.match(/### (.*)/);
+                lastDishName = titleMatch ? titleMatch[1].trim() : "Món ăn từ AI";
+
+                let formattedHtml = rawText
+                    .replace(/^# (.*)/gm, '<h1 class="text-3xl font-black text-orange-600 mb-4">$1</h1>')
+                    .replace(/\|/g, '</td><td>').replace(/\n/g, '</td></tr><tr><td>') // Simple table logic for demo
+                    .replace(/^### (.*)/gm, '<div class="dish-item"><h3 class="dish-title"><i class="fas fa-utensils text-orange-400"></i> $1</h3>')
+                    .replace(/\n/g, '<br>');
+
+                aiResponse.innerHTML = formattedHtml;
+
+                if (user) {
+                    const historyRef = collection(db, 'artifacts', appId, 'users', user.uid, 'history');
+                    await addDoc(historyRef, {
+                        dishName: lastDishName,
+                        content: formattedHtml,
+                        createdAt: serverTimestamp()
+                    });
+                }
+                resultContainer.classList.remove('hidden');
+            } catch (err) {
+                console.error(err);
+                showToast("Lỗi khi tạo công thức.");
+            } finally {
+                loadingState.classList.add('hidden');
+            }
+        });
+
+        async function loadHistory() {
+            if (!user) return;
+            const historyRef = collection(db, 'artifacts', appId, 'users', user.uid, 'history');
+            
+            onSnapshot(historyRef, (snapshot) => {
+                const docs = snapshot.docs.map(d => ({id: d.id, ...d.data()}));
+                docs.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+                
+                if (docs.length === 0) {
+                    historyList.innerHTML = '<p class="col-span-full text-center text-gray-400 py-10">Chưa có công thức nào trong sổ tay.</p>';
+                    return;
+                }
+
+                historyList.innerHTML = docs.map(doc => {
+                    const encoded = btoa(encodeURIComponent(JSON.stringify(doc)));
+                    return `
+                        <div onclick="viewRecipe('${encoded}')" class="group cursor-pointer p-4 bg-white rounded-2xl border border-gray-100 hover:border-orange-200 hover:bg-orange-50 transition-all shadow-sm">
+                            <h4 class="font-bold text-gray-800 text-sm group-hover:text-orange-600 truncate">${doc.dishName}</h4>
+                            <div class="flex items-center justify-between mt-2">
+                                <span class="text-[10px] text-gray-400">${doc.createdAt ? new Date(doc.createdAt.seconds * 1000).toLocaleDateString('vi-VN') : 'Vừa xong'}</span>
+                                <i class="fas fa-chevron-right text-[10px] text-gray-300 group-hover:text-orange-400"></i>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }, (err) => {
+                console.error("Firestore Listen error: ", err);
+            });
+        }
+
+        window.viewRecipe = (encoded) => {
+            const data = JSON.parse(decodeURIComponent(atob(encoded)));
+            aiResponse.innerHTML = data.content;
+            lastDishName = data.dishName;
+            dishImage.classList.add('hidden');
+            resultContainer.classList.remove('hidden');
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        };
+
+        generateImgBtn.addEventListener('click', async () => {
+            if (!lastDishName || !userApiKey) {
+                showToast("Vui lòng tạo công thức trước!");
+                return;
+            }
+            imagePlaceholder.classList.remove('hidden');
+            dishImage.classList.add('hidden');
+            try {
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-001:predict?key=${userApiKey}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ instances: { prompt: `Cinematic food photography of ${lastDishName}, authentic Vietnamese plating, bokeh background, 8k` }, parameters: { sampleCount: 1 } })
+                });
+                const data = await response.json();
+                if (data.predictions?.[0]) {
+                    dishImage.src = `data:image/png;base64,${data.predictions[0].bytesBase64Encoded}`;
+                    dishImage.classList.remove('hidden');
+                }
+            } catch (err) { 
+                showToast("Lỗi khi tạo hình ảnh.");
+            } finally { 
+                imagePlaceholder.classList.add('hidden'); 
+            }
+        });
+    </script>
+</body>
+</html>
