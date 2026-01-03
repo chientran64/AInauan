@@ -27,7 +27,7 @@
             -webkit-text-fill-color: transparent;
         }
 
-        /* Markdown Styling - Optimized for Mobile Tables */
+        /* Markdown Styling */
         #aiResponse {
             font-family: 'Inter', sans-serif;
             color: #374151;
@@ -56,31 +56,23 @@
 
         #aiResponse p { margin-bottom: 1rem; }
 
-        /* Mobile-First Table System - Improved Width */
+        /* Responsive Table to Card System */
+        .table-wrapper {
+            margin: 1.5rem 0;
+        }
+
         #aiResponse table {
             width: 100%;
-            min-width: 300px; /* Đảm bảo bảng không quá nhỏ */
-            display: table; /* Quay lại display table để tận dụng độ rộng */
-            border-collapse: separate;
-            border-spacing: 0;
-            margin: 1.5rem 0;
+            border-collapse: collapse;
+            background: white;
             border-radius: 12px;
             overflow: hidden;
             border: 1px solid #fed7aa;
-            background: white;
-        }
-
-        /* Container bọc bảng để scroll ngang trên mobile */
-        .table-wrapper {
-            width: 100%;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-            margin-bottom: 1.5rem;
         }
 
         #aiResponse th {
             background: #fff7ed;
-            padding: 14px 12px;
+            padding: 12px;
             text-align: left;
             color: #9a3412;
             font-size: 0.8rem;
@@ -93,11 +85,59 @@
             padding: 12px;
             border-bottom: 1px solid #fff7ed;
             font-size: 0.85rem;
-            color: #4b5563;
         }
 
-        #aiResponse tr:last-child td {
-            border-bottom: none;
+        /* Mobile Card view for tables */
+        @media (max-width: 640px) {
+            #aiResponse table, 
+            #aiResponse thead, 
+            #aiResponse tbody, 
+            #aiResponse th, 
+            #aiResponse td, 
+            #aiResponse tr { 
+                display: block; 
+            }
+            
+            #aiResponse thead tr { 
+                position: absolute;
+                top: -9999px;
+                left: -9999px;
+            }
+            
+            #aiResponse tr { 
+                border: 1px solid #fed7aa; 
+                margin-bottom: 10px;
+                border-radius: 12px;
+                background: #fff;
+                padding: 8px;
+            }
+            
+            #aiResponse td { 
+                border: none;
+                position: relative;
+                padding-left: 45%; 
+                text-align: right;
+                min-height: 38px;
+                display: flex;
+                align-items: center;
+                justify-content: flex-end;
+            }
+            
+            #aiResponse td:before { 
+                position: absolute;
+                left: 12px;
+                width: 40%; 
+                white-space: nowrap;
+                text-align: left;
+                font-weight: 700;
+                color: #9a3412;
+                content: attr(data-label);
+                font-size: 0.75rem;
+            }
+
+            #aiResponse td:last-child {
+                border-bottom: none;
+            }
         }
 
         /* Meta info badges */
@@ -143,7 +183,7 @@
             <div class="w-10"></div>
             <div class="text-center">
                 <h1 class="text-3xl md:text-5xl font-extrabold gradient-text mb-1">AI Chef Master</h1>
-                <p class="text-[10px] md:text-xs text-gray-400 font-bold uppercase tracking-widest italic"NẤU ĂN CHO ANH :))</p>
+                <p class="text-[10px] md:text-xs text-gray-400 font-bold uppercase tracking-widest italic">Nấu ăn cho Chiến</p>
             </div>
             <button id="openSettings" class="w-10 h-10 bg-white shadow-sm rounded-full flex items-center justify-center text-gray-400 hover:text-orange-500 border border-gray-100">
                 <i class="fas fa-cog"></i>
@@ -208,19 +248,19 @@
 
                 <div class="grid grid-cols-2 gap-4 mb-6">
                     <div class="space-y-1">
-                        <label class="text-[10px] font-black text-gray-400 uppercase ml-1">Độ khó</label>
+                        <label class="text-[10px] font-black text-gray-400 uppercase ml-1 tracking-wider">Độ phức tạp cách nấu</label>
                         <select id="complexity" class="w-full p-3 bg-gray-50 border border-gray-100 rounded-xl text-xs font-bold text-gray-700 outline-none">
-                            <option value="Dễ">🌟 Dễ (Dưới 15p)</option>
-                            <option value="Trung bình" selected>🏠 Vừa (Bữa cơm gia đình)</option>
-                            <option value="Khó">👨‍🍳 Khó (Yêu cầu kỹ thuật)</option>
+                            <option value="Dễ">🌟 Đơn giản (Ít bước)</option>
+                            <option value="Trung bình" selected>🏠 Vừa sức (Bữa cơm hàng ngày)</option>
+                            <option value="Khó">👨‍🍳 Phức tạp (Nhiều kỹ thuật)</option>
                         </select>
                     </div>
                     <div class="space-y-1">
-                        <label class="text-[10px] font-black text-gray-400 uppercase ml-1">Phong cách Chef</label>
+                        <label class="text-[10px] font-black text-gray-400 uppercase ml-1 tracking-wider">Phong cách hướng dẫn</label>
                         <select id="persona" class="w-full p-3 bg-gray-50 border border-gray-100 rounded-xl text-xs font-bold text-gray-700 outline-none">
-                            <option value="MasterChef" selected>👨‍🍳 MasterChef</option>
-                            <option value="Thân thiện">🌿 Thân thiện</option>
-                            <option value="Hài hước">🤣 Hài hước</option>
+                            <option value="Chuyên sâu (MasterChef)" selected>👨‍🔬 MasterChef (Giải thích nguyên lý)</option>
+                            <option value="Thân thiện (Gia đình)">🌿 Thân thiện (Gần gũi, dễ hiểu)</option>
+                            <option value="Hài hước (Sáng tạo)">🤣 Hài hước (Vui vẻ, thú vị)</option>
                         </select>
                     </div>
                 </div>
@@ -375,10 +415,9 @@
         window.loadContent = (encoded, title) => {
             try {
                 const raw = decodeURIComponent(atob(encoded));
-                // Clear meta header when loading old ones for simplicity or handle if saved
                 document.getElementById('aiMetaHeader').innerHTML = "";
                 document.getElementById('aiResponse').innerHTML = marked.parse(raw);
-                wrapTables();
+                processTables();
                 lastDishName = title;
                 document.getElementById('imageDisplayArea').classList.add('hidden');
                 document.getElementById('resultContainer').classList.remove('hidden');
@@ -386,10 +425,18 @@
             } catch (e) { showToast("Lỗi tải"); }
         };
 
-        const wrapTables = () => {
+        const processTables = () => {
             const responseDiv = document.getElementById('aiResponse');
             const tables = responseDiv.querySelectorAll('table');
             tables.forEach(table => {
+                const headers = Array.from(table.querySelectorAll('th')).map(th => th.innerText);
+                const rows = table.querySelectorAll('tbody tr');
+                rows.forEach(row => {
+                    const cells = row.querySelectorAll('td');
+                    cells.forEach((cell, index) => {
+                        if (headers[index]) cell.setAttribute('data-label', headers[index]);
+                    });
+                });
                 if (!table.parentElement.classList.contains('table-wrapper')) {
                     const wrapper = document.createElement('div');
                     wrapper.className = 'table-wrapper';
@@ -446,7 +493,18 @@
             document.getElementById('loadingState').classList.remove('hidden');
             document.getElementById('resultContainer').classList.add('hidden');
 
-            const systemInstruction = `Bạn là Chef phong cách ${persona}. Hãy viết công thức theo cấu trúc: # [Tên món], ## Tổng quan, ## Nguyên liệu (Dùng Table Markdown bắt buộc), ## Chế biến (Tách các bước rõ ràng), ## Mẹo Chef. Lưu ý: Chỉ trả về nội dung công thức, không bao gồm lời dẫn ngoài.`;
+            const systemInstruction = `Bạn là một Chef có phong cách hướng dẫn "${persona}". 
+            - Hãy thiết kế món ăn dựa trên độ phức tạp yêu cầu là: "${complexity}". 
+            - Nếu là MasterChef, hãy giải thích kỹ thuật nấu, nguyên lý nhiệt và mẹo chuyên sâu.
+            - Nếu là Thân thiện, hãy viết dễ hiểu, gợi ý thay thế nguyên liệu linh hoạt.
+            - Nếu là Hài hước, hãy dùng ngôn từ vui vẻ, tạo cảm hứng nhưng vẫn đảm bảo độ chính xác.
+            Cấu trúc phản hồi bắt buộc:
+            # [Tên món ăn]
+            ## Tổng quan & Độ khó
+            ## Nguyên liệu (Dùng Table Markdown)
+            ## Giai đoạn Chế biến (Tách các bước rõ ràng, tiêu đề đẹp)
+            ## Mẹo từ Chef ${persona}
+            Lưu ý: Chỉ trả về nội dung công thức.`;
 
             try {
                 let prompt = userInput || "Gợi ý một món ăn ngon.";
@@ -463,7 +521,6 @@
 
                 const text = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
                 
-                // Trích xuất tên món chính xác từ dòng đầu tiên có dấu #
                 const lines = text.split('\n');
                 let extractedName = "";
                 for(let line of lines) {
@@ -474,14 +531,13 @@
                 }
                 lastDishName = extractedName || "Món ăn từ AI";
 
-                // Hiển thị meta header
                 document.getElementById('aiMetaHeader').innerHTML = `
-                    <span class="meta-badge"><i class="fas fa-signal mr-1"></i> ${complexity}</span>
+                    <span class="meta-badge"><i class="fas fa-signal mr-1"></i> Độ khó: ${complexity}</span>
                     <span class="meta-badge"><i class="fas fa-user-tie mr-1"></i> Chef ${persona}</span>
                 `;
 
                 document.getElementById('aiResponse').innerHTML = marked.parse(text);
-                wrapTables();
+                processTables();
                 document.getElementById('resultContainer').classList.remove('hidden');
 
                 if (user) {
