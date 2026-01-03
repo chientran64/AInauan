@@ -8,7 +8,7 @@
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap');
         
         :root {
             --primary-orange: #f97316;
@@ -27,69 +27,92 @@
             -webkit-text-fill-color: transparent;
         }
 
-        /* Custom Toggle Switch */
-        .switch {
-            position: relative;
-            display: inline-block;
-            width: 52px;
-            height: 28px;
+        /* Markdown Styling */
+        #aiResponse {
+            font-family: 'Inter', sans-serif;
+            color: #374151;
+            line-height: 1.8;
         }
+        
+        #aiResponse h3 {
+            font-family: 'Quicksand', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #7c2d12;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        #aiResponse h3::before {
+            content: '';
+            display: inline-block;
+            width: 6px;
+            height: 24px;
+            background: var(--primary-orange);
+            border-radius: 10px;
+        }
+
+        #aiResponse table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin: 1.5rem 0;
+            background: #fff;
+            border-radius: 1.25rem;
+            overflow: hidden;
+            border: 1px solid #fed7aa;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        #aiResponse th {
+            background: #fff7ed;
+            padding: 1rem;
+            text-align: left;
+            color: #9a3412;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
+            border-bottom: 2px solid #fed7aa;
+        }
+
+        #aiResponse td {
+            padding: 1rem;
+            border-bottom: 1px solid #fff7ed;
+            font-size: 0.95rem;
+        }
+
+        #aiResponse tr:last-child td { border-bottom: none; }
+        #aiResponse tr:nth-child(even) { background-color: #fdfcfb; }
+        #aiResponse ul, #aiResponse ol { padding-left: 1.5rem; margin-bottom: 1.5rem; }
+        #aiResponse li { margin-bottom: 0.75rem; position: relative; }
+        #aiResponse strong { color: #9a3412; font-weight: 600; }
+
+        .switch { position: relative; display: inline-block; width: 52px; height: 28px; }
         .switch input { opacity: 0; width: 0; height: 0; }
         .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-color: #e2e8f0;
-            transition: .4s;
-            border-radius: 34px;
+            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #e2e8f0; transition: .4s; border-radius: 34px;
         }
         .slider:before {
-            position: absolute;
-            content: "";
-            height: 20px; width: 20px;
-            left: 4px; bottom: 4px;
-            background-color: white;
-            transition: .4s;
-            border-radius: 50%;
+            position: absolute; content: ""; height: 20px; width: 20px; left: 4px; bottom: 4px;
+            background-color: white; transition: .4s; border-radius: 50%;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         input:checked + .slider { background-color: var(--primary-orange); }
         input:checked + .slider:before { transform: translateX(24px); }
 
-        /* Animation cho nút dọn tủ */
-        .pulse-orange {
-            animation: pulse-orange-animation 2s infinite;
-        }
+        .pulse-orange { animation: pulse-orange-animation 2s infinite; }
         @keyframes pulse-orange-animation {
             0% { box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.4); }
             70% { box-shadow: 0 0 0 10px rgba(249, 115, 22, 0); }
             100% { box-shadow: 0 0 0 0 rgba(249, 115, 22, 0); }
         }
 
-        /* Markdown Styling */
-        #aiResponse h1, #aiResponse h2, #aiResponse h3 {
-            color: #431407;
-            font-weight: 800;
-            margin-top: 1.5rem;
-            margin-bottom: 0.75rem;
-        }
-        #aiResponse h3 { font-size: 1.25rem; border-left: 4px solid var(--primary-orange); padding-left: 0.75rem; }
-        #aiResponse table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 1.5rem;
-            background: #fff;
-            border-radius: 1rem;
-            overflow: hidden;
-            border: 1px solid #fed7aa;
-        }
-        #aiResponse th { background: #fff7ed; padding: 0.75rem; text-align: left; color: #9a3412; border-bottom: 2px solid #fed7aa; }
-        #aiResponse td { padding: 0.75rem; border-bottom: 1px solid #fff7ed; }
-
-        .loading-dots:after {
-            content: '.';
-            animation: dots 1.5s steps(5, end) infinite;
-        }
+        .loading-dots:after { content: '.'; animation: dots 1.5s steps(5, end) infinite; }
         @keyframes dots {
             0%, 20% { content: '.'; }
             40% { content: '..'; }
@@ -99,6 +122,10 @@
 
         .modal-overlay { background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); }
         .btn-active-scale:active { transform: scale(0.96); }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #fed7aa; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #f97316; }
     </style>
 </head>
 <body class="min-h-screen pb-10">
@@ -119,16 +146,21 @@
         <div id="settingsModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal-overlay">
             <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-300">
                 <div class="p-5 border-b border-gray-50 flex justify-between items-center">
-                    <h3 class="font-bold text-lg text-gray-800">Cài đặt API</h3>
+                    <h3 class="font-bold text-lg text-gray-800">Cài đặt API (Cloud Sync)</h3>
                     <button id="closeSettings" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 text-gray-400"><i class="fas fa-times"></i></button>
                 </div>
                 <div class="p-6 space-y-5">
+                    <div class="bg-blue-50 p-4 rounded-2xl border border-blue-100 mb-2">
+                        <p class="text-[11px] text-blue-700 font-bold leading-relaxed">
+                            <i class="fas fa-cloud-upload-alt mr-1"></i> Key sẽ được lưu trên hệ thống đám mây. Bạn có thể sử dụng trên mọi thiết bị mà không cần nhập lại.
+                        </p>
+                    </div>
                     <div>
                         <label class="block text-xs font-bold text-gray-400 uppercase mb-2 tracking-wider">Google Gemini API Key</label>
                         <input type="password" id="apiKeyInput" class="w-full p-4 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none transition-all font-mono" placeholder="Nhập API key của bạn...">
                     </div>
                     <button id="saveSettings" class="w-full bg-orange-500 text-white font-bold py-4 rounded-2xl hover:bg-orange-600 shadow-lg shadow-orange-500/30 transition-all btn-active-scale">
-                        LƯU CÀI ĐẶT
+                        LƯU LÊN ĐÁM MÂY
                     </button>
                 </div>
             </div>
@@ -140,8 +172,7 @@
                 
                 <!-- Quick Controls -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
-                    <!-- Nút Dọn tủ lạnh - Thiết kế lại rõ ràng hơn -->
-                    <div class="flex items-center justify-between p-5 bg-orange-50/50 rounded-3xl border border-orange-100/50 pulse-orange">
+                    <div id="fridgeCard" class="flex items-center justify-between p-5 bg-orange-50/50 rounded-3xl border border-orange-100/50 pulse-orange">
                         <div class="flex items-center gap-4">
                             <div class="w-12 h-12 rounded-2xl bg-orange-500 flex items-center justify-center text-white shadow-lg shadow-orange-500/30">
                                 <i class="fas fa-snowflake text-xl"></i>
@@ -157,7 +188,6 @@
                         </label>
                     </div>
 
-                    <!-- Nút Quét ảnh -->
                     <div class="flex items-center justify-between p-5 bg-blue-50/50 rounded-3xl border border-blue-100/50">
                         <div class="flex items-center gap-4">
                             <div class="w-12 h-12 rounded-2xl bg-blue-500 flex items-center justify-center text-white shadow-lg shadow-blue-500/30">
@@ -173,7 +203,7 @@
                     </div>
                 </div>
 
-                <!-- Input Zone: Dọn tủ lạnh (Bung ra khi gạt nút) -->
+                <!-- Input Zone: Fridge -->
                 <div id="ingredientsSection" class="hidden mb-8 animate-in slide-in-from-top-4 duration-500">
                     <div class="bg-gradient-to-br from-orange-50 to-orange-100/30 border border-orange-200 rounded-[2rem] p-6 shadow-inner">
                         <label class="block text-sm font-black text-orange-800 mb-3 ml-1 flex items-center gap-2">
@@ -190,7 +220,6 @@
                     <button id="removeImage" class="absolute -top-3 -right-3 bg-red-500 text-white w-10 h-10 rounded-full flex items-center justify-center shadow-xl border-4 border-white btn-active-scale"><i class="fas fa-times"></i></button>
                 </div>
 
-                <!-- Personalization Options -->
                 <div class="grid grid-cols-2 gap-4 mb-8">
                     <div>
                         <label class="block text-[10px] font-black text-gray-400 mb-2 uppercase tracking-[0.2em] ml-2">Độ khó</label>
@@ -232,11 +261,11 @@
                 </div>
 
                 <!-- Response Area -->
-                <div id="resultContainer" class="hidden mt-12 space-y-8">
+                <div id="resultContainer" class="hidden mt-12 space-y-8 animate-in fade-in duration-700">
                     <img id="dishImage" class="hidden w-full max-h-[500px] object-cover rounded-[3rem] shadow-2xl border-8 border-white" src="">
-                    <div class="bg-white p-6 md:p-10 rounded-[3rem] border border-orange-100 shadow-sm relative overflow-hidden">
-                        <div class="absolute top-0 right-0 w-32 h-32 bg-orange-50/50 rounded-full -mr-16 -mt-16"></div>
-                        <div id="aiResponse" class="text-gray-700 leading-relaxed text-sm md:text-base relative z-10"></div>
+                    <div class="bg-white p-6 md:p-12 rounded-[3rem] border border-orange-100 shadow-xl relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-48 h-48 bg-orange-50/40 rounded-full -mr-24 -mt-24"></div>
+                        <div id="aiResponse" class="relative z-10"></div>
                     </div>
                 </div>
 
@@ -265,7 +294,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, getDoc, collection, addDoc, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBe6c5S5184DmWzjqRvcMkEBwN_UJ1zLD8",
@@ -284,7 +313,7 @@
         let user = null;
         let base64Image = null;
         let lastDishName = ""; 
-        let userApiKey = localStorage.getItem('gemini_api_key') || "";
+        let userApiKey = ""; // Sẽ được tải từ Firestore
 
         const aiResponse = document.getElementById('aiResponse');
         const loadingState = document.getElementById('loadingState');
@@ -298,26 +327,76 @@
         const fridgeIngredients = document.getElementById('fridgeIngredients');
         const ingredientsSection = document.getElementById('ingredientsSection');
 
-        // Logic ẩn hiện section dọn tủ lạnh - Đảm bảo hoạt động 100%
+        // Khởi tạo Auth và tải cấu hình từ Cloud
+        const initApp = async () => {
+            try {
+                // RULE 3: Auth trước
+                await signInAnonymously(auth);
+                
+                onAuthStateChanged(auth, async (u) => {
+                    user = u;
+                    if (user) {
+                        loadHistory();
+                        await syncApiKeyFromCloud(); // Tự động lấy API key khi vào web
+                    }
+                });
+            } catch (err) { console.error("Auth error:", err); }
+        };
+        initApp();
+
+        // Lấy API Key từ Firestore
+        async function syncApiKeyFromCloud() {
+            try {
+                // RULE 1: Đường dẫn public data nghiêm ngặt
+                const configRef = doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'global_config');
+                const docSnap = await getDoc(configRef);
+                
+                if (docSnap.exists()) {
+                    userApiKey = docSnap.data().gemini_key;
+                    document.getElementById('apiKeyInput').value = userApiKey;
+                    console.log("Cloud API Key đã được tải thành công.");
+                }
+            } catch (err) {
+                console.error("Lỗi lấy config:", err);
+            }
+        }
+
+        // Lưu API Key lên Firestore
+        async function saveApiKeyToCloud(key) {
+            if (!user) return;
+            try {
+                const configRef = doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'global_config');
+                await setDoc(configRef, {
+                    gemini_key: key,
+                    updatedAt: serverTimestamp(),
+                    updatedBy: user.uid
+                }, { merge: true });
+                userApiKey = key;
+                showToast("☁️ ĐÃ ĐỒNG BỘ LÊN ĐÁM MÂY!");
+            } catch (err) {
+                console.error("Lỗi lưu config:", err);
+                showToast("LỖI LƯU CẤU HÌNH!");
+            }
+        }
+
         fridgeToggle.addEventListener('change', function() {
             if (this.checked) {
                 ingredientsSection.classList.remove('hidden');
-                document.getElementById('fridgeCard').classList.remove('pulse-orange'); // Tắt pulse khi đã bật
+                document.getElementById('fridgeCard').classList.remove('pulse-orange');
             } else {
                 ingredientsSection.classList.add('hidden');
             }
         });
 
-        // Settings Modal
         document.getElementById('openSettings').onclick = () => document.getElementById('settingsModal').classList.remove('hidden');
         document.getElementById('closeSettings').onclick = () => document.getElementById('settingsModal').classList.add('hidden');
-        document.getElementById('saveSettings').onclick = () => {
-            userApiKey = document.getElementById('apiKeyInput').value.trim();
-            localStorage.setItem('gemini_api_key', userApiKey);
-            showToast("🚀 HỆ THỐNG ĐÃ SẴN SÀNG!");
+        
+        document.getElementById('saveSettings').onclick = async () => {
+            const newKey = document.getElementById('apiKeyInput').value.trim();
+            if (!newKey) return showToast("VUI LÒNG NHẬP KEY!");
+            await saveApiKeyToCloud(newKey);
             document.getElementById('settingsModal').classList.add('hidden');
         };
-        if(userApiKey) document.getElementById('apiKeyInput').value = userApiKey;
 
         function showToast(msg) {
             const t = document.getElementById('toast');
@@ -326,19 +405,20 @@
             setTimeout(() => t.classList.add('opacity-0', 'translate-y-10'), 3000);
         }
 
-        onAuthStateChanged(auth, u => {
-            user = u;
-            if (user) loadHistory();
-            else signInAnonymously(auth);
-        });
-
         async function loadHistory() {
-            const ref = collection(db, 'artifacts', appId, 'users', user.uid, 'history');
-            onSnapshot(ref, snap => {
-                const docs = snap.docs.map(d => d.data()).sort((a,b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
-                if (docs.length === 0) return;
-                historyList.innerHTML = docs.map(doc => `
-                    <div onclick="viewHistory('${btoa(encodeURIComponent(doc.rawMarkdown))}', '${doc.dishName}')" class="group p-5 bg-gray-50/50 rounded-3xl border border-gray-100 cursor-pointer hover:bg-white hover:shadow-xl hover:border-orange-200 transition-all btn-active-scale relative overflow-hidden">
+            if (!user) return;
+            const historyRef = collection(db, 'artifacts', appId, 'users', user.uid, 'history');
+            onSnapshot(historyRef, (snap) => {
+                const docs = snap.docs.map(d => ({id: d.id, ...d.data()}));
+                const sortedDocs = docs.sort((a,b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+                
+                if (sortedDocs.length === 0) {
+                    historyList.innerHTML = '<p class="col-span-full text-center text-gray-400 py-16 font-medium italic">Sổ tay của bạn hiện đang trống...</p>';
+                    return;
+                }
+
+                historyList.innerHTML = sortedDocs.map(doc => `
+                    <div onclick="viewHistory('${btoa(encodeURIComponent(doc.rawMarkdown))}', '${doc.dishName.replace(/'/g, "\\'")}')" class="group p-5 bg-gray-50/50 rounded-3xl border border-gray-100 cursor-pointer hover:bg-white hover:shadow-xl hover:border-orange-200 transition-all btn-active-scale relative overflow-hidden">
                         <div class="absolute top-0 left-0 w-1 h-full bg-orange-500 transform scale-y-0 group-hover:scale-y-100 transition-transform"></div>
                         <h4 class="font-bold text-gray-800 text-sm truncate mb-1">${doc.dishName}</h4>
                         <div class="flex items-center gap-2 text-[10px] text-gray-400 font-bold uppercase tracking-wider">
@@ -356,12 +436,24 @@
             lastDishName = name;
             dishImage.classList.add('hidden');
             resultContainer.classList.remove('hidden');
-            window.scrollTo({top: 0, behavior: 'smooth'});
+            window.scrollTo({top: resultContainer.offsetTop - 50, behavior: 'smooth'});
+        };
+
+        const exponentialBackoff = async (fn, retries = 5) => {
+            for (let i = 0; i < retries; i++) {
+                try { return await fn(); } catch (err) {
+                    if (i === retries - 1) throw err;
+                    await new Promise(r => setTimeout(r, Math.pow(2, i) * 1000));
+                }
+            }
         };
 
         document.getElementById('generateBtn').onclick = async () => {
             if (!userInput.value && !base64Image && !fridgeIngredients.value) return showToast("CHƯA CÓ THÔNG TIN ĐỂ NẤU!");
-            if (!userApiKey) return document.getElementById('settingsModal').classList.remove('hidden');
+            if (!userApiKey) {
+                showToast("CHƯA CÓ API KEY!");
+                return document.getElementById('settingsModal').classList.remove('hidden');
+            }
 
             loadingState.classList.remove('hidden');
             resultContainer.classList.add('hidden');
@@ -370,16 +462,14 @@
                 const systemPrompt = `BẠN LÀ ĐẦU BẾP AI THIÊN TÀI.
                 GIỌNG ĐIỆU PHẢN HỒI: ${personaSelect.value}.
                 TRÌNH ĐỘ NGƯỜI NẤU: ${complexitySelect.value}.
-                
                 QUY TẮC VÀNG:
                 1. NẾU CÓ DANH SÁCH 'NGUYÊN LIỆU TRONG TỦ', BẠN PHẢI TẠO MÓN ĂN DỰA TRÊN CHÚNG LÀ CHÍNH.
                 2. SỬ DỤNG ĐỊNH DẠNG MARKDOWN CHUYÊN NGHIỆP. 
-                3. NGUYÊN LIỆU PHẢI TRÌNH BÀY DẠNG BẢNG (TABLE).
+                3. NGUYÊN LIỆU PHẢI TRÌNH BÀY DẠNG BẢNG (TABLE) gồm Cột Nguyên Liệu và Cột Định Lượng.
                 4. TIÊU ĐỀ BẮT ĐẦU VỚI: ### [Tên món].
-                5. PHẦN HƯỚNG DẪN NẤU PHẢI CỰC KỲ CHI TIẾT VÀ DỄ HIỂU.`;
+                5. PHẦN HƯỚNG DẪN NẤU PHẢI CHIA THÀNH CÁC BƯỚC RÕ RÀNG VỚI SỐ THỨ TỰ.`;
 
                 let fullUserPrompt = userInput.value || "Hãy gợi ý món ăn bất ngờ.";
-                
                 if (fridgeToggle.checked && fridgeIngredients.value) {
                     fullUserPrompt = `[DỌN TỦ LẠNH] Tôi đang có: ${fridgeIngredients.value}. Hãy nấu món gì đó từ đống này. Yêu cầu thêm: ${fullUserPrompt}`;
                 }
@@ -389,34 +479,39 @@
                     promptParts.push({ inlineData: { mimeType: "image/png", data: base64Image } });
                 }
 
-                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${userApiKey}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        contents: [{ role: "user", parts: promptParts }], 
-                        systemInstruction: { parts: [{ text: systemPrompt }] } 
-                    })
-                });
+                const callGemini = async () => {
+                    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${userApiKey}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ 
+                            contents: [{ role: "user", parts: promptParts }], 
+                            systemInstruction: { parts: [{ text: systemPrompt }] } 
+                        })
+                    });
+                    if (!res.ok) throw new Error("API fail");
+                    return await res.json();
+                };
 
-                const data = await res.json();
+                const data = await exponentialBackoff(callGemini);
                 const rawMarkdown = data.candidates[0].content.parts[0].text;
-                
                 const titleMatch = rawMarkdown.match(/### (.*)/);
                 lastDishName = titleMatch ? titleMatch[1].trim() : "Món ngon AI";
 
                 aiResponse.innerHTML = marked.parse(rawMarkdown);
 
                 if (user) {
-                    addDoc(collection(db, 'artifacts', appId, 'users', user.uid, 'history'), {
+                    const historyRef = collection(db, 'artifacts', appId, 'users', user.uid, 'history');
+                    await addDoc(historyRef, {
                         dishName: lastDishName,
                         rawMarkdown: rawMarkdown,
                         createdAt: serverTimestamp()
                     });
                 }
+                
                 resultContainer.classList.remove('hidden');
                 window.scrollTo({top: resultContainer.offsetTop - 50, behavior: 'smooth'});
             } catch (err) {
-                showToast("LỖI KẾT NỐI! KIỂM TRA LẠI KEY.");
+                showToast("LỖI KẾT NỐI API!");
                 console.error(err);
             } finally {
                 loadingState.classList.add('hidden');
@@ -428,15 +523,20 @@
             dishImage.classList.add('hidden');
             showToast("📸 ĐANG CHỤP ẢNH...");
             try {
-                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-001:predict?key=${userApiKey}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        instances: { prompt: `A stunning professional food photography of ${lastDishName}, gourmet presentation on a ceramic plate, soft natural side lighting, high resolution 4k, macro lens, shallow depth of field` }, 
-                        parameters: { sampleCount: 1 } 
-                    })
-                });
-                const data = await res.json();
+                const callImagen = async () => {
+                    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-001:predict?key=${userApiKey}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ 
+                            instances: { prompt: `A stunning professional food photography of ${lastDishName}, gourmet presentation on a ceramic plate, soft natural side lighting, high resolution 4k, macro lens` }, 
+                            parameters: { sampleCount: 1 } 
+                        })
+                    });
+                    if (!res.ok) throw new Error("Image API fail");
+                    return await res.json();
+                };
+                
+                const data = await exponentialBackoff(callImagen);
                 if (data.predictions?.[0]) {
                     dishImage.src = `data:image/png;base64,${data.predictions[0].bytesBase64Encoded}`;
                     dishImage.classList.remove('hidden');
@@ -444,7 +544,6 @@
             } catch (err) { showToast("KHÔNG THỂ TẠO ẢNH."); }
         };
 
-        // File Picker
         document.getElementById('imageInput').onchange = e => {
             const file = e.target.files[0];
             if (file) {
