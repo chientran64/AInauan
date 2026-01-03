@@ -3,16 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AI Chef Master - Sổ Tay Nấu Nướng Chuyên Nghiệp</title>
+    <title>AI Chef Master - Quản Lý Bữa Ăn Chuyên Nghiệp</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap');
         
         :root {
             --primary-orange: #f97316;
             --secondary-amber: #fbbf24;
+            --chef-dark: #7c2d12;
         }
 
         body {
@@ -27,7 +28,7 @@
             -webkit-text-fill-color: transparent;
         }
 
-        /* Markdown Styling */
+        /* Nâng cấp Markdown Styling - Làm nổi bật tiêu đề */
         #aiResponse {
             font-family: 'Inter', sans-serif;
             color: #374151;
@@ -35,31 +36,54 @@
         }
         
         #aiResponse h1 {
-            font-size: 1.75rem;
+            font-size: 2rem;
             font-weight: 800;
-            color: #7c2d12;
-            margin: 0.5rem 0 1.5rem 0;
+            color: var(--chef-dark);
+            margin: 1rem 0 1.5rem 0;
             text-align: center;
             line-height: 1.2;
+            text-transform: uppercase;
+            border-bottom: 4px solid var(--secondary-amber);
+            padding-bottom: 10px;
         }
 
         #aiResponse h2 {
-            font-size: 1.25rem;
+            font-size: 1.4rem;
             font-weight: 700;
             color: #9a3412;
-            margin: 2rem 0 1rem 0;
+            margin: 2.5rem 0 1rem 0;
+            padding-left: 12px;
+            border-left: 5px solid var(--primary-orange);
+            background: #fff7ed;
+            padding-top: 8px;
             padding-bottom: 8px;
-            border-bottom: 2px dashed #fed7aa;
+            border-radius: 0 8px 8px 0;
+        }
+
+        #aiResponse h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #c2410c;
+            margin: 1.5rem 0 0.5rem 0;
             display: flex;
             align-items: center;
         }
 
-        #aiResponse p { margin-bottom: 1rem; }
-
-        /* Responsive Table to Card System */
-        .table-wrapper {
-            margin: 1.5rem 0;
+        #aiResponse h3::before {
+            content: "◆";
+            margin-right: 8px;
+            color: var(--secondary-amber);
         }
+
+        #aiResponse p { margin-bottom: 1.2rem; }
+
+        /* Shopping List UI */
+        #shoppingListDrawer {
+            transition: transform 0.3s ease-in-out;
+            z-index: 100;
+        }
+
+        .table-wrapper { margin: 1.5rem 0; }
 
         #aiResponse table {
             width: 100%;
@@ -87,88 +111,21 @@
             font-size: 0.85rem;
         }
 
-        /* Mobile Card view for tables */
         @media (max-width: 640px) {
-            #aiResponse table, 
-            #aiResponse thead, 
-            #aiResponse tbody, 
-            #aiResponse th, 
-            #aiResponse td, 
-            #aiResponse tr { 
-                display: block; 
-            }
-            
-            #aiResponse thead tr { 
-                position: absolute;
-                top: -9999px;
-                left: -9999px;
-            }
-            
-            #aiResponse tr { 
-                border: 1px solid #fed7aa; 
-                margin-bottom: 10px;
-                border-radius: 12px;
-                background: #fff;
-                padding: 8px;
-            }
-            
-            #aiResponse td { 
-                border: none;
-                position: relative;
-                padding-left: 45%; 
-                text-align: right;
-                min-height: 38px;
-                display: flex;
-                align-items: center;
-                justify-content: flex-end;
-            }
-            
-            #aiResponse td:before { 
-                position: absolute;
-                left: 12px;
-                width: 40%; 
-                white-space: nowrap;
-                text-align: left;
-                font-weight: 700;
-                color: #9a3412;
-                content: attr(data-label);
-                font-size: 0.75rem;
-            }
-
-            #aiResponse td:last-child {
-                border-bottom: none;
-            }
+            #aiResponse table, #aiResponse thead, #aiResponse tbody, #aiResponse th, #aiResponse td, #aiResponse tr { display: block; }
+            #aiResponse thead tr { position: absolute; top: -9999px; left: -9999px; }
+            #aiResponse tr { border: 1px solid #fed7aa; margin-bottom: 10px; border-radius: 12px; background: #fff; padding: 8px; }
+            #aiResponse td { border: none; position: relative; padding-left: 45%; text-align: right; min-height: 38px; display: flex; align-items: center; justify-content: flex-end; }
+            #aiResponse td:before { position: absolute; left: 12px; width: 40%; white-space: nowrap; text-align: left; font-weight: 700; color: #9a3412; content: attr(data-label); font-size: 0.75rem; }
         }
 
-        /* Meta info badges */
-        .recipe-meta {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 1.5rem;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-        .meta-badge {
-            background: #fff7ed;
-            color: #c2410c;
-            padding: 4px 12px;
-            border-radius: 99px;
-            font-size: 11px;
-            font-weight: 700;
-            border: 1px solid #ffedd5;
-            text-transform: uppercase;
-        }
+        .recipe-meta { display: flex; gap: 8px; margin-bottom: 1.5rem; justify-content: center; flex-wrap: wrap; }
+        .meta-badge { background: #fff7ed; color: #c2410c; padding: 4px 12px; border-radius: 99px; font-size: 11px; font-weight: 700; border: 1px solid #ffedd5; text-transform: uppercase; }
 
         .switch { position: relative; display: inline-block; width: 44px; height: 22px; }
         .switch input { opacity: 0; width: 0; height: 0; }
-        .slider {
-            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
-            background-color: #cbd5e1; transition: .4s; border-radius: 34px;
-        }
-        .slider:before {
-            position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px;
-            background-color: white; transition: .4s; border-radius: 50%;
-        }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #cbd5e1; transition: .4s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
         input:checked + .slider { background-color: var(--primary-orange); }
         input:checked + .slider:before { transform: translateX(22px); }
 
@@ -177,6 +134,27 @@
     </style>
 </head>
 <body class="min-h-screen pb-10">
+
+    <button id="toggleShoppingList" class="fixed bottom-6 right-6 w-14 h-14 bg-orange-600 text-white rounded-full shadow-2xl z-[60] flex items-center justify-center btn-active-scale">
+        <i class="fas fa-shopping-basket text-xl"></i>
+        <span id="cartCount" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold px-2 py-1 rounded-full">0</span>
+    </button>
+
+    <div id="shoppingListDrawer" class="fixed inset-y-0 right-0 w-full md:w-96 bg-white shadow-2xl transform translate-x-full z-[70] flex flex-col">
+        <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-orange-50">
+            <h3 class="font-black text-orange-900 uppercase tracking-tighter flex items-center gap-2">
+                <i class="fas fa-list-ul"></i> Danh sách mua sắm
+            </h3>
+            <button id="closeShoppingList" class="text-gray-400 hover:text-red-500 transition-colors"><i class="fas fa-times text-xl"></i></button>
+        </div>
+        <div id="shoppingItemsContainer" class="flex-1 overflow-y-auto p-6 space-y-4">
+            <p class="text-center text-gray-400 italic text-sm py-10">Danh sách trống. Hãy thêm nguyên liệu từ công thức!</p>
+        </div>
+        <div class="p-6 border-t border-gray-100 space-y-3">
+            <button id="clearShoppingList" class="w-full py-3 text-xs font-bold text-gray-400 uppercase tracking-widest hover:text-red-500 transition-colors">Xóa tất cả</button>
+            <button onclick="window.print()" class="w-full bg-orange-500 text-white font-bold py-4 rounded-xl shadow-lg btn-active-scale">IN DANH SÁCH</button>
+        </div>
+    </div>
 
     <div class="max-w-4xl mx-auto px-4 py-6">
         <header class="flex justify-between items-center mb-8">
@@ -190,7 +168,6 @@
             </button>
         </header>
 
-        <!-- API Settings Modal -->
         <div id="settingsModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal-overlay">
             <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden">
                 <div class="p-5 border-b border-gray-50 flex justify-between items-center">
@@ -209,8 +186,6 @@
 
         <div class="bg-white rounded-[2rem] shadow-xl overflow-hidden border border-orange-50 mb-8">
             <div class="p-6 md:p-10">
-                
-                <!-- Main Controls -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                     <div class="flex items-center justify-between p-4 bg-orange-50/40 rounded-2xl border border-orange-100">
                         <div class="flex items-center gap-3">
@@ -233,7 +208,6 @@
                     </div>
                 </div>
 
-                <!-- Input Zone -->
                 <div id="ingredientsSection" class="hidden mb-6">
                     <div class="bg-gray-50 border border-gray-200 rounded-xl p-4">
                         <label class="block text-[10px] font-black text-gray-400 mb-2 uppercase">Nguyên liệu đang có:</label>
@@ -248,25 +222,25 @@
 
                 <div class="grid grid-cols-2 gap-4 mb-6">
                     <div class="space-y-1">
-                        <label class="text-[10px] font-black text-gray-400 uppercase ml-1 tracking-wider">Độ phức tạp cách nấu</label>
+                        <label class="text-[10px] font-black text-gray-400 uppercase ml-1 tracking-wider">Độ phức tạp</label>
                         <select id="complexity" class="w-full p-3 bg-gray-50 border border-gray-100 rounded-xl text-xs font-bold text-gray-700 outline-none">
-                            <option value="Dễ">🌟 Đơn giản (Ít bước)</option>
-                            <option value="Trung bình" selected>🏠 Vừa sức (Bữa cơm hàng ngày)</option>
-                            <option value="Khó">👨‍🍳 Phức tạp (Nhiều kỹ thuật)</option>
+                            <option value="Dễ">🌟 Đơn giản</option>
+                            <option value="Trung bình" selected>🏠 Vừa sức</option>
+                            <option value="Khó">👨‍🍳 Phức tạp</option>
                         </select>
                     </div>
                     <div class="space-y-1">
-                        <label class="text-[10px] font-black text-gray-400 uppercase ml-1 tracking-wider">Phong cách hướng dẫn</label>
+                        <label class="text-[10px] font-black text-gray-400 uppercase ml-1 tracking-wider">Phong cách Chef</label>
                         <select id="persona" class="w-full p-3 bg-gray-50 border border-gray-100 rounded-xl text-xs font-bold text-gray-700 outline-none">
-                            <option value="Chuyên sâu (MasterChef)" selected>👨‍🔬 MasterChef (Giải thích nguyên lý)</option>
-                            <option value="Thân thiện (Gia đình)">🌿 Thân thiện (Gần gũi, dễ hiểu)</option>
-                            <option value="Hài hước (Sáng tạo)">🤣 Hài hước (Vui vẻ, thú vị)</option>
+                            <option value="Chuyên sâu (MasterChef)" selected>👨‍🔬 MasterChef</option>
+                            <option value="Thân thiện (Gia đình)">🌿 Thân thiện</option>
+                            <option value="Hài hước (Sáng tạo)">🤣 Hài hước</option>
                         </select>
                     </div>
                 </div>
 
                 <div class="mb-6">
-                    <label class="text-[10px] font-black text-gray-400 uppercase ml-1 block mb-1">Món bạn muốn nấu hoặc yêu cầu riêng</label>
+                    <label class="text-[10px] font-black text-gray-400 uppercase ml-1 block mb-1">Món ăn hoặc yêu cầu riêng</label>
                     <textarea id="userInput" rows="3" class="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:border-orange-400 text-sm" placeholder="Hôm nay tôi muốn ăn món gì đó thanh đạm..."></textarea>
                 </div>
 
@@ -274,17 +248,18 @@
                     <i class="fas fa-fire"></i> LÊN THỰC ĐƠN NGAY
                 </button>
 
-                <!-- Loading -->
                 <div id="loadingState" class="hidden text-center py-10">
                     <div class="w-12 h-12 border-4 border-orange-500/20 border-t-orange-500 rounded-full animate-spin mx-auto"></div>
                     <p class="mt-4 text-[10px] text-gray-400 font-black uppercase tracking-widest">Đang thiết kế công thức...</p>
                 </div>
 
-                <!-- Result -->
                 <div id="resultContainer" class="hidden mt-10 space-y-6">
-                    <div class="border-t border-gray-50 pt-6">
-                        <button id="generateImgBtn" class="w-full bg-amber-50 text-amber-700 font-bold py-3 rounded-xl flex items-center justify-center gap-2 border border-amber-100 text-xs">
-                            <i class="fas fa-magic"></i> XUẤT ẢNH AI MINH HỌA
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <button id="generateImgBtn" class="w-full bg-amber-50 text-amber-700 font-bold py-3 rounded-xl flex items-center justify-center gap-2 border border-amber-100 text-xs transition-all hover:bg-amber-100">
+                            <i class="fas fa-magic"></i> XUẤT ẢNH AI
+                        </button>
+                        <button id="addToListBtn" class="w-full bg-orange-600 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 text-xs shadow-lg transition-all hover:bg-orange-700">
+                            <i class="fas fa-cart-plus"></i> THÊM VÀO GIỎ MUA SẮM
                         </button>
                     </div>
                     
@@ -303,7 +278,6 @@
             </div>
         </div>
 
-        <!-- History -->
         <div class="bg-white rounded-3xl shadow-sm p-6 border border-gray-100">
             <h2 class="text-sm font-black text-gray-800 mb-4 flex items-center gap-2 uppercase tracking-tighter">
                 <i class="fas fa-book-open text-orange-400"></i> Nhật ký nấu nướng
@@ -317,15 +291,15 @@
     <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] bg-gray-900 text-white px-6 py-3 rounded-full text-[10px] font-bold shadow-2xl transition-all duration-500 opacity-0 translate-y-10"></div>
 
     <script type="module">
+        // Import & Config (GIỮ NGUYÊN)
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc, collection, onSnapshot, serverTimestamp, addDoc, query } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
+        
         const firebaseConfig = JSON.parse('{"apiKey":"AIzaSyBe6c5S5184DmWzjqRvcMkEBwN_UJ1zLD8","authDomain":"ainauan-f11d0.firebaseapp.com","projectId":"ainauan-f11d0","storageBucket":"ainauan-f11d0.firebasestorage.app","messagingSenderId":"855598869176","appId":"1:855598869176:web:462b821ab92fb7eba1624d"}');
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        
         const customAppId = 'cooking-master-app-v2';
         const historyCollectionName = 'history_records';
         const configDocPath = 'global_config';
@@ -334,6 +308,7 @@
         let base64Image = null;
         let lastDishName = "";
         let userApiKey = "";
+        let shoppingList = JSON.parse(localStorage.getItem('ai_chef_shopping_list') || '[]');
 
         const showToast = (m) => {
             const t = document.getElementById('toast');
@@ -344,20 +319,84 @@
             }
         };
 
+        // --- SHOPPING LIST LOGIC ---
+        const updateShoppingUI = () => {
+            const container = document.getElementById('shoppingItemsContainer');
+            const cartCount = document.getElementById('cartCount');
+            cartCount.innerText = shoppingList.length;
+
+            if (shoppingList.length === 0) {
+                container.innerHTML = '<p class="text-center text-gray-400 italic text-sm py-10">Danh sách trống.</p>';
+                return;
+            }
+
+            container.innerHTML = shoppingList.map((item, idx) => `
+                <div class="bg-gray-50 p-4 rounded-xl border border-gray-100">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="font-bold text-orange-800 text-xs uppercase">${item.dish}</span>
+                        <button onclick="window.removeItem(${idx})" class="text-gray-300 hover:text-red-500"><i class="fas fa-trash"></i></button>
+                    </div>
+                    <ul class="text-sm space-y-1 text-gray-600">
+                        ${item.ingredients.map(ing => `
+                            <li class="flex items-center gap-2">
+                                <input type="checkbox" class="rounded border-gray-300 text-orange-500 focus:ring-orange-500">
+                                <span>${ing}</span>
+                            </li>
+                        `).join('')}
+                    </ul>
+                </div>
+            `).join('');
+            localStorage.setItem('ai_chef_shopping_list', JSON.stringify(shoppingList));
+        };
+
+        window.removeItem = (index) => {
+            shoppingList.splice(index, 1);
+            updateShoppingUI();
+        };
+
+        document.getElementById('clearShoppingList').onclick = () => {
+            if(confirm('Xóa toàn bộ danh sách?')) {
+                shoppingList = [];
+                updateShoppingUI();
+            }
+        };
+
+        document.getElementById('toggleShoppingList').onclick = () => {
+            document.getElementById('shoppingListDrawer').classList.remove('translate-x-full');
+        };
+
+        document.getElementById('closeShoppingList').onclick = () => {
+            document.getElementById('shoppingListDrawer').classList.add('translate-x-full');
+        };
+
+        document.getElementById('addToListBtn').onclick = () => {
+            const table = document.querySelector('#aiResponse table');
+            if (!table) return showToast("Không tìm thấy danh sách nguyên liệu");
+
+            const rows = table.querySelectorAll('tbody tr');
+            const ingredients = Array.from(rows).map(row => {
+                const cells = row.querySelectorAll('td');
+                // Lấy cột nguyên liệu và định lượng (giả định cột 1 và 2)
+                return `${cells[0]?.innerText || ''} (${cells[1]?.innerText || ''})`;
+            });
+
+            shoppingList.push({
+                dish: lastDishName,
+                ingredients: ingredients
+            });
+            updateShoppingUI();
+            showToast("Đã thêm vào giỏ mua sắm!");
+            document.getElementById('shoppingListDrawer').classList.remove('translate-x-full');
+        };
+
+        // --- CORE LOGIC (GIỮ NGUYÊN & CẬP NHẬT PROMPT) ---
         const initAuth = async () => {
             try {
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    try {
-                        await signInWithCustomToken(auth, __initial_auth_token);
-                    } catch (tokenErr) {
-                        await signInAnonymously(auth);
-                    }
-                } else {
-                    await signInAnonymously(auth);
-                }
-            } catch (error) {
-                console.error("Auth error:", error);
-            }
+                    try { await signInWithCustomToken(auth, __initial_auth_token); } 
+                    catch (tokenErr) { await signInAnonymously(auth); }
+                } else { await signInAnonymously(auth); }
+            } catch (error) { console.error("Auth error:", error); }
         };
 
         onAuthStateChanged(auth, async (u) => {
@@ -372,11 +411,11 @@
                     }
                 } catch (e) { console.warn("Config not found"); }
                 setupHistoryListener();
-            } else {
-                initAuth();
-            }
+                updateShoppingUI();
+            } else { initAuth(); }
         });
 
+        // (setupHistoryListener, renderHistory, loadContent, processTables - GIỮ NGUYÊN)
         const setupHistoryListener = () => {
             if (!user) return;
             const historyRef = collection(db, 'artifacts', customAppId, 'public', 'data', historyCollectionName);
@@ -446,17 +485,12 @@
             });
         };
 
+        // (API FETCH & ACTIONS)
         document.getElementById('saveSettings').onclick = async () => {
-            if (!user) return;
             const key = document.getElementById('apiKeyInput').value.trim();
             try {
-                await setDoc(doc(db, 'artifacts', customAppId, 'public', 'data', 'settings', configDocPath), { 
-                    apiKey: key,
-                    updatedAt: serverTimestamp()
-                });
-                userApiKey = key;
-                showToast("Đã lưu API Key");
-                document.getElementById('settingsModal').classList.add('hidden');
+                await setDoc(doc(db, 'artifacts', customAppId, 'public', 'data', 'settings', configDocPath), { apiKey: key, updatedAt: serverTimestamp() });
+                userApiKey = key; showToast("Đã lưu API Key"); document.getElementById('settingsModal').classList.add('hidden');
             } catch (e) { showToast("Lỗi lưu"); }
         };
 
@@ -468,23 +502,14 @@
             let delay = 1000;
             for (let i = 0; i < 5; i++) {
                 try {
-                    const response = await fetch(url, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
-                    });
+                    const response = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
                     if (response.ok) return await response.json();
-                } catch (err) {
-                    if (i === 4) throw err;
-                    await new Promise(r => setTimeout(r, delay));
-                    delay *= 2;
-                }
+                } catch (err) { if (i === 4) throw err; await new Promise(r => setTimeout(r, delay)); delay *= 2; }
             }
         }
 
         document.getElementById('generateBtn').onclick = async () => {
             if (!userApiKey) return showToast("Cần nhập API Key");
-            
             const userInput = document.getElementById('userInput').value;
             const ingredients = document.getElementById('fridgeIngredients').value;
             const complexity = document.getElementById('complexity').value;
@@ -493,94 +518,65 @@
             document.getElementById('loadingState').classList.remove('hidden');
             document.getElementById('resultContainer').classList.add('hidden');
 
-            const systemInstruction = `Bạn là một Chef có phong cách hướng dẫn "${persona}". 
-            - Hãy thiết kế món ăn dựa trên độ phức tạp yêu cầu là: "${complexity}". 
-            - Nếu là MasterChef, hãy giải thích kỹ thuật nấu, nguyên lý nhiệt và mẹo chuyên sâu.
-            - Nếu là Thân thiện, hãy viết dễ hiểu, gợi ý thay thế nguyên liệu linh hoạt.
-            - Nếu là Hài hước, hãy dùng ngôn từ vui vẻ, tạo cảm hứng nhưng vẫn đảm bảo độ chính xác.
-            Cấu trúc phản hồi bắt buộc:
-            # [Tên món ăn]
+            // Cập nhật System Instruction để làm nổi bật cấu trúc
+            const systemInstruction = `Bạn là một Chef chuyên nghiệp phong cách "${persona}".
+            Thiết kế món ăn độ khó "${complexity}".
+            Cấu trúc phản hồi (SỬ DỤNG ĐÚNG CẤP ĐỘ TIÊU ĐỀ):
+            # [Tên món ăn - Viết In Hoa]
             ## Tổng quan & Độ khó
-            ## Nguyên liệu (Dùng Table Markdown)
-            ## Giai đoạn Chế biến (Tách các bước rõ ràng, tiêu đề đẹp)
-            ## Mẹo từ Chef ${persona}
-            Lưu ý: Chỉ trả về nội dung công thức.`;
+            ## Nguyên liệu (Bắt buộc dùng Table Markdown: | Nguyên liệu | Định lượng | Ghi chú |)
+            ## Giai đoạn Chế biến (Sử dụng tiêu đề ### cho mỗi giai đoạn lớn như Sơ chế, Chế biến, Trình bày)
+            ## Bí quyết từ Chef ${persona} (Dùng tiêu đề ##)
+            Lưu ý: Các bước thực hiện phải đánh số rõ ràng, xuống dòng để dễ đọc trên di động.`;
 
             try {
                 let prompt = userInput || "Gợi ý một món ăn ngon.";
-                if (document.getElementById('fridgeToggle').checked) prompt = `Nguyên liệu đang có: ${ingredients}. Yêu cầu: ${prompt}`;
-
+                if (document.getElementById('fridgeToggle').checked) prompt = `Nguyên liệu: ${ingredients}. Yêu cầu: ${prompt}`;
+                
                 const contents = [{ role: "user", parts: [{ text: prompt }] }];
                 if (base64Image) contents[0].parts.push({ inlineData: { mimeType: "image/png", data: base64Image } });
 
                 const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${userApiKey}`;
-                const data = await fetchGemini(url, { 
-                    contents, 
-                    systemInstruction: { parts: [{ text: systemInstruction }] }
-                });
-
+                const data = await fetchGemini(url, { contents, systemInstruction: { parts: [{ text: systemInstruction }] } });
                 const text = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
                 
                 const lines = text.split('\n');
                 let extractedName = "";
-                for(let line of lines) {
-                    if(line.trim().startsWith('#')) {
-                        extractedName = line.replace(/#/g, '').trim();
-                        break;
-                    }
-                }
+                for(let line of lines) { if(line.trim().startsWith('#')) { extractedName = line.replace(/#/g, '').trim(); break; } }
                 lastDishName = extractedName || "Món ăn từ AI";
 
                 document.getElementById('aiMetaHeader').innerHTML = `
-                    <span class="meta-badge"><i class="fas fa-signal mr-1"></i> Độ khó: ${complexity}</span>
-                    <span class="meta-badge"><i class="fas fa-user-tie mr-1"></i> Chef ${persona}</span>
+                    <span class="meta-badge"><i class="fas fa-signal mr-1"></i> ${complexity}</span>
+                    <span class="meta-badge"><i class="fas fa-user-tie mr-1"></i> ${persona}</span>
                 `;
-
                 document.getElementById('aiResponse').innerHTML = marked.parse(text);
                 processTables();
                 document.getElementById('resultContainer').classList.remove('hidden');
 
                 if (user) {
                     await addDoc(collection(db, 'artifacts', customAppId, 'public', 'data', historyCollectionName), {
-                        dishName: lastDishName,
-                        title: lastDishName,
-                        content: text,
-                        complexity: complexity,
-                        persona: persona,
-                        createdAt: serverTimestamp()
+                        dishName: lastDishName, title: lastDishName, content: text, complexity, persona, createdAt: serverTimestamp()
                     });
                 }
-                
                 window.scrollTo({top: document.getElementById('resultContainer').offsetTop - 20, behavior: 'smooth'});
-            } catch (e) {
-                showToast("Lỗi: " + e.message);
-            } finally {
-                document.getElementById('loadingState').classList.add('hidden');
-            }
+            } catch (e) { showToast("Lỗi: " + e.message); } finally { document.getElementById('loadingState').classList.add('hidden'); }
         };
 
+        // (Image Gen & Input - GIỮ NGUYÊN)
         document.getElementById('generateImgBtn').onclick = async () => {
             if (!lastDishName || !userApiKey) return;
             document.getElementById('imageDisplayArea').classList.remove('hidden');
             document.getElementById('imageLoading').classList.remove('hidden');
             document.getElementById('dishImage').classList.add('hidden');
-
             try {
                 const url = `https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-001:predict?key=${userApiKey}`;
-                const data = await fetchGemini(url, {
-                    instances: [{ prompt: `Professional food photography of ${lastDishName}, 4k, gourmet plating, warm lighting` }],
-                    parameters: { sampleCount: 1 }
-                });
-                
+                const data = await fetchGemini(url, { instances: [{ prompt: `Professional food photography of ${lastDishName}, 4k, gourmet plating, warm lighting` }], parameters: { sampleCount: 1 } });
                 if (data.predictions?.[0]?.bytesBase64Encoded) {
                     document.getElementById('dishImage').src = `data:image/png;base64,${data.predictions[0].bytesBase64Encoded}`;
                     document.getElementById('dishImage').classList.remove('hidden');
                     document.getElementById('imageLoading').classList.add('hidden');
                 }
-            } catch (e) {
-                showToast("Lỗi tạo ảnh.");
-                document.getElementById('imageDisplayArea').classList.add('hidden');
-            }
+            } catch (e) { showToast("Lỗi tạo ảnh."); document.getElementById('imageDisplayArea').classList.add('hidden'); }
         };
 
         document.getElementById('imageInput').onchange = (e) => {
