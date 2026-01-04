@@ -106,7 +106,7 @@
         <header class="flex justify-between items-center mb-8">
             <div class="w-10"></div>
             <div class="text-center">
-                <h1 class="text-3xl md:text-5xl font-extrabold gradient-text mb-1 italic">AI Chef Master</h1>
+                <h1 class="text-3xl md:text-5xl font-extrabold gradient-text mb-1 italic">HÔM NAY ĂN GÌ</h1>
                 <p class="text-[10px] md:text-xs text-gray-400 font-bold uppercase tracking-[0.2em] italic">Nấu ăn cho Chiến</p>
             </div>
             <button id="openSettings" class="w-10 h-10 bg-white shadow-sm rounded-full flex items-center justify-center text-gray-400 hover:text-orange-500 border border-gray-100">
@@ -399,7 +399,7 @@
             document.getElementById('resultContainer').classList.add('hidden');
 
             const sysPrompt = `Bạn là Chef với phong cách "${persona}". 
-            Thiết kế thực đơn hoặc món ăn chuyên nghiệp.
+            Thiết kế thực đơn hoặc món ăn với độ khó: ${complexity}.
             
             QUY TẮC ĐỊNH DẠNG:
             1. Mỗi món ăn BẮT ĐẦU bằng tiêu đề # Tên món hoặc ## Tên món.
