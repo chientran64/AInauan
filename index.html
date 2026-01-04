@@ -131,22 +131,45 @@
         <div class="bg-white rounded-[2rem] shadow-xl overflow-hidden border border-orange-50 mb-8">
             <div class="p-4 md:p-10">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                    <div class="flex items-center justify-between p-4 bg-orange-50/40 rounded-2xl border border-orange-100">
-                        <div class="flex items-center gap-3">
-                            <i class="fas fa-box-open text-orange-500"></i>
-                            <span class="font-bold text-orange-900 text-sm italic">Chế độ dọn tủ lạnh</span>
-                        </div>
-                        <label class="switch"><input type="checkbox" id="fridgeToggle"><span class="slider"></span></label>
-                    </div>
-                    <div class="flex items-center justify-between p-4 bg-blue-50/40 rounded-2xl border border-blue-100">
-                        <div class="flex items-center gap-3">
-                            <i class="fas fa-camera-retro text-blue-500"></i>
-                            <span class="font-bold text-blue-900 text-sm italic">Quét nguyên liệu</span>
-                        </div>
-                        <button onclick="document.getElementById('imageInput').click()" class="bg-white text-blue-600 px-3 py-1.5 rounded-lg text-[10px] font-black border uppercase">Tải ảnh</button>
-                        <input type="file" id="imageInput" class="hidden" accept="image/*">
-                    </div>
-                </div>
+    <div class="space-y-3">
+        <div class="flex items-center justify-between p-4 bg-orange-50/40 rounded-2xl border border-orange-100">
+            <div class="flex items-center gap-3">
+                <i class="fas fa-box-open text-orange-500"></i>
+                <span class="font-bold text-orange-900 text-sm italic">Chế độ dọn tủ lạnh</span>
+            </div>
+            <label class="switch"><input type="checkbox" id="fridgeToggle"><span class="slider"></span></label>
+        </div>
+        <div class="flex items-center justify-between p-4 bg-purple-50/40 rounded-2xl border border-purple-100">
+            <div class="flex items-center gap-3">
+                <i class="fas fa-calendar-check text-purple-500"></i>
+                <span class="font-bold text-purple-900 text-[11px] italic">Không lặp món (7 ngày)</span>
+            </div>
+            <label class="switch"><input type="checkbox" id="noRepeatToggle"><span class="slider"></span></label>
+        </div>
+    </div>
+    <div class="flex items-center justify-between p-4 bg-blue-50/40 rounded-2xl border border-blue-100">
+        </div>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6"> <div class="space-y-1.5">
+        <label class="text-[9px] font-black text-gray-400 uppercase ml-1 italic">Độ phức tạp</label>
+        <select id="complexity" ...> </select>
+    </div>
+    <div class="space-y-1.5">
+        <label class="text-[9px] font-black text-gray-400 uppercase ml-1 italic">Phong cách</label>
+        <select id="persona" ...> </select>
+    </div>
+    <div class="space-y-1.5">
+        <label class="text-[9px] font-black text-gray-400 uppercase ml-1 italic">Loại bữa ăn</label>
+        <select id="mealType" class="w-full p-3 bg-gray-50 border border-gray-100 rounded-xl text-xs font-bold text-gray-700 outline-none">
+            <option value="Đa dạng" selected>🌐 Đa dạng</option>
+            <option value="Dành cho trẻ em">👶 Cho trẻ em</option>
+            <option value="Ăn chay">🥦 Ăn chay</option>
+            <option value="Healthy (Eat Clean)">🥗 Healthy</option>
+            <option value="Tiệc / Cuối tuần">🥂 Tiệc tùng</option>
+        </select>
+    </div>
+</div>
 
                 <div id="ingredientsSection" class="hidden mb-6">
                     <div class="bg-gray-50 border rounded-xl p-4">
@@ -392,15 +415,38 @@
 
         document.getElementById('generateBtn').onclick = async () => {
             if (!userApiKey) return showToast("Vui lòng cấu hình API Key.");
-            const input = document.getElementById('userInput').value;
-            const complexity = document.getElementById('complexity').value;
-            const persona = document.getElementById('persona').value;
+           const input = document.getElementById('userInput').value;
+    const complexity = document.getElementById('complexity').value;
+    const persona = document.getElementById('persona').value;
+    const mealType = document.getElementById('mealType').value; // Lấy loại bữa ăn
+    const noRepeat = document.getElementById('noRepeatToggle').checked;
+let avoidDishesPrompt = "";
+    
+    // Logic lấy món ăn trong 7 ngày gần nhất
+    if (noRepeat && user) {
+        const historyRef = collection(db, 'artifacts', customAppId, 'public', 'data', historyCollectionName);
+        // Lấy dữ liệu thực tế từ lịch sử (giả định bạn đã có list history)
+        const sevenDaysAgo = Date.now() - (7 * 24 * 60 * 60 * 1000);
+        
+        // Bạn có thể lọc từ danh sách history đã load sẵn trong renderHistory hoặc query mới
+        const recentDishes = Array.from(document.querySelectorAll('#historyList h4'))
+            .slice(0, 20) // Lấy khoảng 20 món gần nhất để AI tránh
+            .map(el => el.innerText)
+            .join(", ");
+        
+        if (recentDishes) {
+            avoidDishesPrompt = `\nTUYỆT ĐỐI KHÔNG gợi ý lại các món sau đây (đã ăn trong 7 ngày qua): ${recentDishes}.`;
+        }
+    }
+
 
             document.getElementById('loadingState').classList.remove('hidden');
             document.getElementById('resultContainer').classList.add('hidden');
 
             const sysPrompt = `Bạn là Chef với phong cách hướng dẫn "${persona}". 
             Thiết kế thực đơn hoặc món ăn với độ khó: ${complexity}.
+            Thiết kế thực đơn theo loại hình: "${mealType}
+            ${avoidDishesPrompt}
             
             QUY TẮC ĐỊNH DẠNG:
             1. Mỗi món ăn BẮT ĐẦU bằng tiêu đề # Tên món hoặc ## Tên món.
