@@ -172,8 +172,8 @@
                     <div class="space-y-1.5">
                         <label class="text-[9px] font-black text-gray-400 uppercase ml-1 italic">Phong cách hướng dẫn</label>
                         <select id="persona" class="w-full p-3 bg-gray-50 border border-gray-100 rounded-xl text-xs font-bold text-gray-700 outline-none">
-                            <option value="Chuyên sâu (MasterChef)" selected>👨‍🔬 MasterChef</option>
-                            <option value="Thân thiện (Gia đình)">🌿 Gia đình</option>
+                            <option value="Chuyên sâu (MasterChef)">👨‍🔬 MasterChef</option>
+                            <option value="Thân thiện (Gia đình)" selected>🌿 Gia đình</option>
                             <option value="Hài hước (Sáng tạo)">🤣 Vui nhộn</option>
                         </select>
                     </div>
@@ -398,16 +398,23 @@
             document.getElementById('loadingState').classList.remove('hidden');
             document.getElementById('resultContainer').classList.add('hidden');
 
-            const sysPrompt = `Bạn là Chef với phong cách "${persona}". 
+            const sysPrompt = `Bạn là Chef với phong cách hướng dẫn "${persona}". 
             Thiết kế thực đơn hoặc món ăn với độ khó: ${complexity}.
             
             QUY TẮC ĐỊNH DẠNG:
             1. Mỗi món ăn BẮT ĐẦU bằng tiêu đề # Tên món hoặc ## Tên món.
             2. Mỗi món PHẢI CÓ bảng nguyên liệu Markdown: | Nguyên liệu | Định lượng | Ghi chú |.
-            3. Hướng dẫn các bước chi tiết.
+            3. Hướng dẫn các bước chi tiết phù hợp với trình độ "${complexity}".
+            - Nếu là "Dễ": Ưu tiên nguyên liệu phổ biến tại siêu thị/chợ, tối giản các bước sơ chế, tổng thời gian nấu dưới 20 phút, có thể là các món ăn liền.
+            - Nếu là "Trung bình": Tập trung vào các món cơm gia đình truyền thống hoặc hiện đại, có sự kết hợp nhiều món (mặn, canh, xào), quy trình chế biến đầy đủ các bước.
+            - Nếu là "Khó": Sử dụng kỹ thuật nấu nướng nâng cao (như sous-vide, áp chảo chuẩn độ chín, làm sốt phức tạp), chú trọng vào decor (trình bày) và sự tầng lớp của hương vị.
+            4. DỰA TRÊN PHONG CÁCH "${persona}", HÃY TUÂN THỦ CÁCH VIẾT:
+            - Chuyên sâu (MasterChef): Sử dụng thuật ngữ chuyên môn, giải thích cơ chế hóa học của thực phẩm (ví dụ: phản ứng Maillard), tập trung vào sự chính xác tuyệt đối và tính nghệ thuật cao.
+            - Thân thiện (Gia đình): Ngôn ngữ ấm áp, gần gũi như một người thân đang hướng dẫn. Ưu tiên các nguyên liệu dễ tìm, cách làm tối ưu hóa cho bếp gia đình và nhấn mạnh vào sự gắn kết.
+            - Hài hước (Sáng tạo): Sử dụng ngôn từ vui nhộn, các ví dụ so sánh hóm hỉnh, tạo không khí thoải mái, cổ vũ người nấu thử nghiệm những điều mới lạ và phá cách.
             
             QUY TẮC NÂNG CAO KỸ NĂNG (QUAN TRỌNG):
-            - Ngay cả khi phong cách là Thân thiện, hãy luôn lồng ghép các kỹ thuật nấu ăn chuyên sâu.
+            - Ngay cả khi phong cách là Thân thiện hay, hãy luôn lồng ghép các kỹ thuật nấu ăn chuyên sâu.
             - Cuối mỗi món ăn hoặc cuối toàn bộ hướng dẫn, PHẢI CÓ một phần tiêu đề "## 👨‍🍳 Chef's Secret Tips & Tricks" tổng hợp các mẹo nhỏ nhưng hiệu quả cao (Ví dụ: cách chọn thịt tươi, mẹo khử mùi, cách canh lửa, mẹo trình bày...). 
             - Những mẹo này phải thực sự hữu ích để nâng tầm món ăn từ mức gia đình lên chuyên nghiệp.`;
 
