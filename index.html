@@ -139,6 +139,14 @@
             </div>
             <label class="switch"><input type="checkbox" id="fridgeToggle"><span class="slider"></span></label>
         </div>
+           <div class="flex items-center justify-between p-4 bg-blue-50/40 rounded-2xl border border-blue-100">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-camera-retro text-blue-500"></i>
+                            <span class="font-bold text-blue-900 text-sm italic">Quét nguyên liệu</span>
+                        </div>
+                        <button onclick="document.getElementById('imageInput').click()" class="bg-white text-blue-600 px-3 py-1.5 rounded-lg text-[10px] font-black border uppercase">Tải ảnh</button>
+                        <input type="file" id="imageInput" class="hidden" accept="image/*">
+                    </div>
         <div class="flex items-center justify-between p-4 bg-purple-50/40 rounded-2xl border border-purple-100">
             <div class="flex items-center gap-3">
                 <i class="fas fa-calendar-check text-purple-500"></i>
