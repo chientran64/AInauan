@@ -26,7 +26,7 @@
             background: linear-gradient(90deg, var(--primary-orange), var(--secondary-amber));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            padding-right: 0.5rem; /* Thêm padding để tránh lỗi cắt chữ italic */
+            padding-right: 0.5rem;
         }
 
         /* Markdown Styling */
@@ -107,7 +107,6 @@
         <header class="flex justify-between items-center mb-8">
             <div class="w-10"></div>
             <div class="text-center">
-                <!-- Thêm pr-4 để tránh bị che chữ italic -->
                 <h1 class="text-3xl md:text-5xl font-extrabold gradient-text mb-1 italic pr-4">HÔM NAY ĂN GÌ</h1>
                 <p class="text-[10px] md:text-xs text-gray-400 font-bold uppercase tracking-[0.2em] italic">Nấu ăn cho Chiến</p>
             </div>
@@ -171,34 +170,46 @@
                     <button id="removeImage" class="absolute top-2 right-2 bg-red-500 text-white w-8 h-8 rounded-full"><i class="fas fa-times"></i></button>
                 </div>
 
-                <div class="grid grid-cols-3 gap-3 mb-6">
-                    <div class="space-y-1">
-                        <label class="text-[9px] font-black text-gray-400 uppercase ml-1 italic">Độ phức tạp thực đơn</label>
-                        <select id="complexity" class="w-full p-2 bg-gray-50 border border-gray-100 rounded-xl text-[11px] font-bold text-gray-700 outline-none">
-                            <option value="Dễ">🌟 Nấu nhanh 15p</option>
-                            <option value="Trung bình" selected>🏠 Bữa cơm gia đình</option>
-                            <option value="Khó">👨‍🍳 Chuẩn nhà hàng</option>
-                        </select>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-3 mb-6">
+                    <!-- Độ phức tạp -->
+                    <div class="flex flex-col gap-1 border-b border-dashed border-gray-200 pb-3 md:border-none md:pb-0">
+                        <div class="flex items-center justify-between md:flex-col md:items-start md:space-y-1">
+                            <label class="text-[10px] md:text-[9px] font-black text-gray-400 uppercase ml-1 italic">Độ phức tạp</label>
+                            <select id="complexity" class="w-[60%] md:w-full p-2 bg-gray-50 border border-gray-100 rounded-xl text-[11px] font-bold text-gray-700 outline-none text-right md:text-left">
+                                <option value="Dễ">🌟 Nấu nhanh 15p</option>
+                                <option value="Trung bình" selected>🏠 Bữa cơm gia đình</option>
+                                <option value="Khó">👨‍🍳 Chuẩn nhà hàng</option>
+                            </select>
+                        </div>
+                        <p id="complexityDesc" class="text-[9px] text-red-500 font-bold italic text-right md:text-left leading-tight min-h-[12px] mt-1"></p>
                     </div>
-                   <div class="space-y-1">
-                        <label class="text-[9px] font-black text-gray-400 uppercase ml-1 italic">Phong cách hướng dẫn</label>
-                        <select id="persona" class="w-full p-3 bg-gray-50 border border-gray-100 rounded-xl text-xs font-bold text-gray-700 outline-none">
-                            <option value="Chuyên sâu (MasterChef)">👨‍🔬 MasterChef</option>
-                            <option value="Thân thiện (Gia đình)" selected>🌿 Gia đình</option>
-                            <option value="Hài hước (Sáng tạo)">🤣 Vui nhộn</option>
-                        </select>
+
+                    <!-- Phong cách -->
+                    <div class="flex flex-col gap-1 border-b border-dashed border-gray-200 pb-3 md:border-none md:pb-0">
+                        <div class="flex items-center justify-between md:flex-col md:items-start md:space-y-1">
+                            <label class="text-[10px] md:text-[9px] font-black text-gray-400 uppercase ml-1 italic">Phong cách</label>
+                            <select id="persona" class="w-[60%] md:w-full p-2 bg-gray-50 border border-gray-100 rounded-xl text-[11px] font-bold text-gray-700 outline-none text-right md:text-left">
+                                <option value="Chuyên sâu (MasterChef)">👨‍🔬 MasterChef</option>
+                                <option value="Thân thiện (Gia đình)" selected>🌿 Gia đình</option>
+                                <option value="Hài hước (Sáng tạo)">🤣 Vui nhộn</option>
+                            </select>
+                        </div>
+                        <p id="personaDesc" class="text-[9px] text-red-500 font-bold italic text-right md:text-left leading-tight min-h-[12px] mt-1"></p>
                     </div>
-                    <div class="space-y-1">
-                        <label class="text-[9px] font-black text-gray-400 uppercase ml-1 italic">Loại bữa ăn</label>
-                        <select id="mealType" class="w-full p-3 bg-gray-50 border border-gray-100 rounded-xl text-xs font-bold text-gray-700 outline-none">
-                           <option value="Đa dạng" selected>🌐 Đa dạng</option>
-                            <option value="Dành cho trẻ em">👶 Cho trẻ em</option>
-                            <option value="Ăn chay">🥦 Ăn chay</option>
-                            <option value="Healthy (Eat Clean)">🥗 Healthy</option>
-                            <option value="Tiệc / Cuối tuần">🥂 Tiệc tùng</option>
-                        </select>
-                        <!-- Thêm phần hiển thị giải thích -->
-                        <p id="mealDesc" class="text-[9px] text-orange-600 font-bold italic mt-1 leading-tight min-h-[24px]">Cân bằng dinh dưỡng, đổi món liên tục.</p>
+
+                    <!-- Loại bữa ăn -->
+                    <div class="flex flex-col gap-1 pb-3 md:pb-0">
+                        <div class="flex items-center justify-between md:flex-col md:items-start md:space-y-1">
+                            <label class="text-[10px] md:text-[9px] font-black text-gray-400 uppercase ml-1 italic">Loại bữa ăn</label>
+                            <select id="mealType" class="w-[60%] md:w-full p-2 bg-gray-50 border border-gray-100 rounded-xl text-[11px] font-bold text-gray-700 outline-none text-right md:text-left">
+                                <option value="Đa dạng" selected>🌐 Đa dạng</option>
+                                <option value="Dành cho trẻ em">👶 Cho trẻ em</option>
+                                <option value="Ăn chay">🥦 Ăn chay</option>
+                                <option value="Healthy (Eat Clean)">🥗 Healthy</option>
+                                <option value="Tiệc / Cuối tuần">🥂 Tiệc tùng</option>
+                            </select>
+                        </div>
+                        <p id="mealDesc" class="text-[9px] text-red-500 font-bold italic text-right md:text-left leading-tight min-h-[12px] mt-1">Cân bằng dinh dưỡng, đổi món liên tục.</p>
                     </div>
                 </div>
 
@@ -443,9 +454,21 @@ let avoidDishesPrompt = "";
             document.getElementById('loadingState').classList.remove('hidden');
             document.getElementById('resultContainer').classList.add('hidden');
 
+            // Định nghĩa chi tiết hướng dẫn cho từng loại bữa ăn để đưa vào Prompt
+            const mealTypePrompts = {
+                "Đa dạng": "Hãy kết hợp nhiều phương pháp nấu (chiên, xào, canh) để bữa ăn phong phú. Đảm bảo đủ các nhóm chất dinh dưỡng.",
+                "Dành cho trẻ em": "QUAN TRỌNG: Món ăn phải mềm, dễ nhai, màu sắc bắt mắt (dùng rau củ nhiều màu). Hạn chế tối đa gia vị cay nóng, quá mặn. Ưu tiên các món giàu canxi và protein phát triển chiều cao.",
+                "Ăn chay": "Tuyệt đối không sử dụng thịt, cá hay nước mắm mặn. Sử dụng các loại nấm, đậu hũ, rau củ để tạo vị ngọt tự nhiên (Umami). Đảm bảo đủ đạm từ thực vật.",
+                "Healthy (Eat Clean)": "Ưu tiên phương pháp hấp, luộc, áp chảo ít dầu. Hạn chế đường tinh luyện và tinh bột nhanh. Tập trung vào rau xanh, ức gà, cá, gạo lứt.",
+                "Tiệc / Cuối tuần": "Thiết kế món ăn mang tính 'chia sẻ' (sharing plates) dành cho nhiều người. Chú trọng vào cách trình bày lộng lẫy (centerpiece). Có thể tốn nhiều thời gian chế biến hơn bình thường để tạo độ ngon đặc biệt."
+            };
+            const selectedMealTypePrompt = mealTypePrompts[mealType] || "";
+
+
             const sysPrompt = `Bạn là Chef với phong cách hướng dẫn "${persona}". 
             Thiết kế thực đơn hoặc món ăn với độ khó: ${complexity}.
-            Thiết kế thực đơn theo loại hình: "${mealType}
+            Thiết kế thực đơn theo loại hình: "${mealType}".
+            YÊU CẦU ĐẶC BIỆT CHO LOẠI BỮA ĂN NÀY: ${selectedMealTypePrompt}
             ${avoidDishesPrompt}
             
             QUY TẮC ĐỊNH DẠNG:
@@ -518,12 +541,29 @@ let avoidDishesPrompt = "";
             "Tiệc / Cuối tuần": "Món ăn cầu kỳ, khẩu phần lớn để chia sẻ."
         };
         
-        document.getElementById('mealType').onchange = (e) => {
-            const val = e.target.value;
-            // Tìm key gần đúng nhất trong object (do value có thể khác nhau ở các option)
-            // Trong trường hợp này value option khớp với key nên lấy trực tiếp
-            document.getElementById('mealDesc').innerText = mealDescs[val] || "Cân bằng dinh dưỡng.";
+        const complexityDescs = {
+            "Dễ": "Dưới 20 phút, nguyên liệu phổ biến.",
+            "Trung bình": "Cơm gia đình, đủ các món mặn/canh.",
+            "Khó": "Kỹ thuật cao, trang trí cầu kỳ."
         };
+
+        const personaDescs = {
+            "Chuyên sâu (MasterChef)": "Thuật ngữ chuyên môn, chính xác.",
+            "Thân thiện (Gia đình)": "Ấm áp, dễ hiểu, gần gũi.",
+            "Hài hước (Sáng tạo)": "Vui nhộn, kích thích sáng tạo."
+        };
+
+        const updateDesc = (id, map, val) => {
+             document.getElementById(id).innerText = map[val] || "";
+        };
+        
+        document.getElementById('mealType').onchange = (e) => updateDesc('mealDesc', mealDescs, e.target.value);
+        document.getElementById('complexity').onchange = (e) => updateDesc('complexityDesc', complexityDescs, e.target.value);
+        document.getElementById('persona').onchange = (e) => updateDesc('personaDesc', personaDescs, e.target.value);
+
+        // Init descs
+        updateDesc('complexityDesc', complexityDescs, document.getElementById('complexity').value);
+        updateDesc('personaDesc', personaDescs, document.getElementById('persona').value);
 
         document.getElementById('saveSettings').onclick = async () => {
             const key = document.getElementById('apiKeyInput').value.trim();
