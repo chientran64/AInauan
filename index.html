@@ -26,6 +26,7 @@
             background: linear-gradient(90deg, var(--primary-orange), var(--secondary-amber));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            padding-right: 0.5rem; /* Thêm padding để tránh lỗi cắt chữ italic */
         }
 
         /* Markdown Styling */
@@ -106,7 +107,8 @@
         <header class="flex justify-between items-center mb-8">
             <div class="w-10"></div>
             <div class="text-center">
-                <h1 class="text-3xl md:text-5xl font-extrabold gradient-text mb-1 italic">HÔM NAY ĂN GÌ</h1>
+                <!-- Thêm pr-4 để tránh bị che chữ italic -->
+                <h1 class="text-3xl md:text-5xl font-extrabold gradient-text mb-1 italic pr-4">HÔM NAY ĂN GÌ</h1>
                 <p class="text-[10px] md:text-xs text-gray-400 font-bold uppercase tracking-[0.2em] italic">Nấu ăn cho Chiến</p>
             </div>
             <button id="openSettings" class="w-10 h-10 bg-white shadow-sm rounded-full flex items-center justify-center text-gray-400 hover:text-orange-500 border border-gray-100">
@@ -130,16 +132,16 @@
 
         <div class="bg-white rounded-[2rem] shadow-xl overflow-hidden border border-orange-50 mb-8">
             <div class="p-4 md:p-10">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                <div class="space-y-3">
-                <div class="flex items-center justify-between p-4 bg-orange-50/40 rounded-2xl border border-orange-100">
-                  <div class="flex items-center gap-3">
-                <i class="fas fa-box-open text-orange-500"></i>
-                <span class="font-bold text-orange-900 text-sm italic">Chế độ dọn tủ lạnh</span>
-                </div>
-            <label class="switch"><input type="checkbox" id="fridgeToggle"><span class="slider"></span></label>
-            </div>
-           <div class="flex items-center justify-between p-4 bg-blue-50/40 rounded-2xl border border-blue-100">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    <div class="flex items-center justify-between p-4 bg-orange-50/40 rounded-2xl border border-orange-100 h-full">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-box-open text-orange-500"></i>
+                            <span class="font-bold text-orange-900 text-sm italic">Chế độ dọn tủ lạnh</span>
+                        </div>
+                        <label class="switch"><input type="checkbox" id="fridgeToggle"><span class="slider"></span></label>
+                    </div>
+                    
+                    <div class="flex items-center justify-between p-4 bg-blue-50/40 rounded-2xl border border-blue-100 h-full">
                         <div class="flex items-center gap-3">
                             <i class="fas fa-camera-retro text-blue-500"></i>
                             <span class="font-bold text-blue-900 text-sm italic">Quét nguyên liệu</span>
@@ -147,13 +149,15 @@
                         <button onclick="document.getElementById('imageInput').click()" class="bg-white text-blue-600 px-3 py-1.5 rounded-lg text-[10px] font-black border uppercase">Tải ảnh</button>
                         <input type="file" id="imageInput" class="hidden" accept="image/*">
                     </div>
-        <div class="flex items-center justify-between p-4 bg-purple-50/40 rounded-2xl border border-purple-100">
-            <div class="flex items-center gap-3">
-                <i class="fas fa-calendar-check text-purple-500"></i>
-                <span class="font-bold text-purple-900 text-[11px] italic">Không lặp món (7 ngày)</span>
-            </div>
-            <label class="switch"><input type="checkbox" id="noRepeatToggle"><span class="slider"></span></label>
-        </div>
+
+                    <div class="flex items-center justify-between p-4 bg-purple-50/40 rounded-2xl border border-purple-100 h-full">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-calendar-check text-purple-500"></i>
+                            <span class="font-bold text-purple-900 text-[11px] italic">Không lặp món (7 ngày)</span>
+                        </div>
+                        <label class="switch"><input type="checkbox" id="noRepeatToggle"><span class="slider"></span></label>
+                    </div>
+                </div>
 
                 <div id="ingredientsSection" class="hidden mb-6">
                     <div class="bg-gray-50 border rounded-xl p-4">
@@ -170,7 +174,7 @@
                 <div class="grid grid-cols-3 gap-3 mb-6">
                     <div class="space-y-1">
                         <label class="text-[9px] font-black text-gray-400 uppercase ml-1 italic">Độ phức tạp thực đơn</label>
-                        <select id="mealType" class="w-full p-2 bg-gray-50 border border-gray-100 rounded-xl text-[11px] font-bold text-gray-700 outline-none">
+                        <select id="complexity" class="w-full p-2 bg-gray-50 border border-gray-100 rounded-xl text-[11px] font-bold text-gray-700 outline-none">
                             <option value="Dễ">🌟 Nấu nhanh 15p</option>
                             <option value="Trung bình" selected>🏠 Bữa cơm gia đình</option>
                             <option value="Khó">👨‍🍳 Chuẩn nhà hàng</option>
@@ -193,6 +197,8 @@
                             <option value="Healthy (Eat Clean)">🥗 Healthy</option>
                             <option value="Tiệc / Cuối tuần">🥂 Tiệc tùng</option>
                         </select>
+                        <!-- Thêm phần hiển thị giải thích -->
+                        <p id="mealDesc" class="text-[9px] text-orange-600 font-bold italic mt-1 leading-tight min-h-[24px]">Cân bằng dinh dưỡng, đổi món liên tục.</p>
                     </div>
                 </div>
 
@@ -501,6 +507,22 @@ let avoidDishesPrompt = "";
                     document.getElementById('imageLoading').classList.add('hidden');
                 }
             } catch (e) { showToast("Lỗi phân tích từ AI."); } finally { document.getElementById('loadingState').classList.add('hidden'); }
+        };
+
+        // Logic hiển thị mô tả loại bữa ăn
+        const mealDescs = {
+            "Đa dạng": "Cân bằng dinh dưỡng, đổi món liên tục.",
+            "Dành cho trẻ em": "Ít gia vị, mềm, dễ ăn, trang trí bắt mắt.",
+            "Ăn chay": "Thanh đạm, không thịt cá, giàu chất xơ.",
+            "Healthy (Eat Clean)": "Ít dầu mỡ, calo thấp, tập trung vào sức khỏe.",
+            "Tiệc / Cuối tuần": "Món ăn cầu kỳ, khẩu phần lớn để chia sẻ."
+        };
+        
+        document.getElementById('mealType').onchange = (e) => {
+            const val = e.target.value;
+            // Tìm key gần đúng nhất trong object (do value có thể khác nhau ở các option)
+            // Trong trường hợp này value option khớp với key nên lấy trực tiếp
+            document.getElementById('mealDesc').innerText = mealDescs[val] || "Cân bằng dinh dưỡng.";
         };
 
         document.getElementById('saveSettings').onclick = async () => {
